@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="angularjsNodejsTutorial">
+
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CIS550 Project: Dashboard/Cuisines</title>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.2/angular.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+    <script src="javascripts/app.js" type="text/javascript"></script>
+    <!-- Custom styles for this template-->
+    <link href="/stylesheets/common.css" rel="stylesheet">
+    <link href="/stylesheets/dashboard.css" rel="stylesheet">
+  </head>
+
+  <body ng-controller="dashboardController">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <span class="navbar-brand center">CIS550 Project</span>
+      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+        <div class="navbar-nav">
+          <a class="nav-item nav-link active" href="/">Dashboard/Cuisines</a>
+          <a class="nav-item nav-link" href="/recommendations">Recommendations</a>
+          <a class="nav-item nav-link" href="/bestof">Best Of</a>
+          <a class="nav-item nav-link" href="/posters">Posters</a>
+          <a class="nav-item nav-link" href="/reference">Reference</a>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container cuisine-container">
+      <div class="jumbotron">
+        <div class="h5">Cuisine</div>
+        <br>
+        <div class="input-container">
+          <div class="h6">Want more info on a certain Cuisine?</div>
+          <input type="text" ng-model="cuisineName" placeholder="Enter Cuisine" id="cuisineName" class="cuisine-input"/>
+          <button id="cuisineDataBtn" class="submit-btn" ng-click="cuisineData()">Comprehensive Cuisine Data</button>
+          <button id="cuisineNeighborhoodBtn" class="submit-btn" ng-click="bestNeighborhood()">Find Best Neighborhood for Cuisine</button>
+        </div>
+        <br>
+        <div class="row">
+          <div class="text">Best Neighborhood for Cuisine: </div>
+          <div class="text">{{neighborhood}}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- User Content -->
+    <div class="container movie-container">
+      <div class="jumbotron">
+        <!-- Display top 10 movies when a genre is clicked -->
+        <div class="movies-container">
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <td>
+                  <a href="#" ng-click="sortType = 'score'; sortReverse = !sortReverse">
+                    Inspection Score 
+                    <span ng-show="sortType == 'score' && sortReverse" class="fa fa-caret-down"></span>
+                    <span ng-show="sortType == 'score' && !sortReverse" class="fa fa-caret-up"></span>
+                  </a>
+                </td>
+                <td>
+                  <a href="#" ng-click="sortType = 'rating'; sortReverse = !sortReverse">
+                    Rating
+                    <span ng-show="sortType == 'rating' && sortReverse" class="fa fa-caret-down"></span>
+                    <span ng-show="sortType == 'rating' && !sortReverse" class="fa fa-caret-up"></span>
+                  </a>
+                </td>
+                <td>
+                  <a href="#" ng-click="sortType = 'price'; sortReverse = !sortReverse">
+                    Price Level
+                    <span ng-show="sortType == 'price' && sortReverse" class="fa fa-caret-down"></span>
+                    <span ng-show="sortType == 'price' && !sortReverse" class="fa fa-caret-up"></span>
+                  </a>
+                </td>
+                <td>
+                  <a href="#" ng-click="sortType = 'neighborhood'; sortReverse = !sortReverse">
+                    Neighborhood
+                    <span ng-show="sortType == 'neighborhood' && sortReverse" class="fa fa-caret-down"></span>
+                    <span ng-show="sortType == 'neighborhood' && !sortReverse" class="fa fa-caret-up"></span>
+                  </a>
+                </td>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr ng-repeat="cuisine in cuisineInfo | orderBy:sortType:sortReverse">
+                <td>{{cuisine.title}}</td>
+                <td>{{cuisine.id}}</td>
+                <td>{{cuisine.rating}}</td>
+                <td>{{cuisine.vote_count}}</td>
+              </tr>
+            </tbody>
+
+          </table>
+
+<!--           <div class="movie">
+            <div class="header"><strong>Inspection Score</strong></div>
+            <div class="header"><strong>Rating</strong></div>
+            <div class="header"><strong>Price Level</strong></div>
+            <div class="header"><strong>Neighborhood</strong></div>
+          </div>
+          <div class="movie" id="results" ng-repeat="cuisine in cuisineInfo">
+            <div class="title">{{movie.title}}</div>
+            <div class="id">{{movie.id}}</div>
+            <div class="rating">{{movie.rating}}</div>
+            <div class="vote-count">{{movie.vote_count}}</div>
+          </div> -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Include these before the end of body tag in every HTML file -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+  </body>
+
+</html>
