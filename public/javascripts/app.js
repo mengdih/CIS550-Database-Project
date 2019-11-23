@@ -12,16 +12,16 @@ app.controller('dashboardController', function($scope, $http) {
  //    console.log("Genre ERROR: ", err);
  //  });
 
-	// $scope.showMovies = function(g) {
-	// 	$http({
-	//   	url: '/genres/' + g.genre,
-	//     method: 'GET'
-	//   }).then(res => {
-	//     console.log("movies: ", res.data);
-	//     $scope.movies = res.data;
-	//   }, err => {
-	//     console.log("Movie ERROR: ", err);
-	//   });
+  // $scope.showMovies = function(g) {
+  //  $http({
+  //    url: '/genres/' + g.genre,
+  //     method: 'GET'
+  //   }).then(res => {
+  //     console.log("movies: ", res.data);
+  //     $scope.movies = res.data;
+  //   }, err => {
+  //     console.log("Movie ERROR: ", err);
+  //   });
  //  }
 
   $scope.sortType = 'score'; // set the default sort type
@@ -44,27 +44,47 @@ app.controller('dashboardController', function($scope, $http) {
   };
 
   $scope.cuisineData = function() {
-		$http({
-	  	url: '/cuisine/' + $scope.cuisineName,
-	    method: 'GET'
-	  }).then(res => {
-	    console.log("cuisine: ", res.data);
-	    $scope.cuisineInfo = res.data;
-	  }, err => {
-	    console.log("Movie ERROR: ", err);
-	  });
+    if($scope.cuisineName != null){
+      var score = 100;
+      var rating = -1;
+      var price = 100;
+
+      if($scope.scoreFilter != null) score = $scope.scoreFilter;
+      if($scope.ratingFilter != null) rating = $scope.ratingFilter;
+      if($scope.priceFilter != null) price = $scope.priceFilter;
+
+      $http({
+        url: '/cuisine/' + $scope.cuisineName + '/' + score + '/' + rating + '/' + price,
+        method: 'GET'
+      }).then(res => {
+        console.log("cuisine: ", res.data);
+        $scope.cuisineInfo = res.data;
+      }, err => {
+        console.log("Movie ERROR: ", err);
+      });
+    }
   }
 
   $scope.bestNeighborhood = function() {
-    $http({
-      url: '/cuisineNeighborhood/' + $scope.cuisineName,
-      method: 'GET'
-    }).then(res => {
-      console.log("movies: ", res.data);
-      $scope.neighborhood = res.data[0].neighborhood;
-    }, err => {
-      console.log("Movie ERROR: ", err);
-    });
+    if($scope.cuisineName != null){
+      var score = 100;
+      var rating = -1;
+      var price = 100;
+
+      if($scope.scoreFilter != null) score = $scope.scoreFilter;
+      if($scope.ratingFilter != null) rating = $scope.ratingFilter;
+      if($scope.priceFilter != null) price = $scope.priceFilter;
+
+      $http({
+        url: '/cuisineNeighborhood/' + $scope.cuisineName + '/' + score + '/' + rating + '/' + price,
+        method: 'GET'
+      }).then(res => {
+        console.log("movies: ", res.data);
+        $scope.neighborhood = res.data[0].neighborhood;
+      }, err => {
+        console.log("Movie ERROR: ", err);
+      });
+  }
   }
 });
 
@@ -73,15 +93,15 @@ app.controller('recommendationsController', function($scope, $http) {
   // TODO: Q2
 
   $scope.submitIds = function() {
-		$http({
-	  	url: '/recommendations/' + $scope.movieName,
-	    method: 'GET'
-	  }).then(res => {
-	    console.log("movies: ", res.data);
-	    $scope.recommendedMovies = res.data;
-	  }, err => {
-	    console.log("Movie ERROR: ", err);
-	  });
+    $http({
+      url: '/recommendations/' + $scope.movieName,
+      method: 'GET'
+    }).then(res => {
+      console.log("movies: ", res.data);
+      $scope.recommendedMovies = res.data;
+    }, err => {
+      console.log("Movie ERROR: ", err);
+    });
   }
 });
 
@@ -89,25 +109,25 @@ app.controller('recommendationsController', function($scope, $http) {
 app.controller('bestofController', function($scope, $http) {
   // TODO: Q3
   $http({
-	  url: '/decades',
-	  method: 'GET'
-	}).then(res => {
-	  console.log("decades: ", res.data);
-	  $scope.decades = res.data;
-	}, err => {
-	  console.log("Decades ERROR: ", err);
-	});
+    url: '/decades',
+    method: 'GET'
+  }).then(res => {
+    console.log("decades: ", res.data);
+    $scope.decades = res.data;
+  }, err => {
+    console.log("Decades ERROR: ", err);
+  });
 
   $scope.submitDecade = function() {
-		$http({
-	  	url: '/bestof/' + $scope.selectedDecade.decade,
-	    method: 'GET'
-	  }).then(res => {
-	    console.log("best movies: ", res.data);
-	    $scope.bestofMovies = res.data;
-	  }, err => {
-	    console.log("Best Movie ERROR: ", err);
-	  });
+    $http({
+      url: '/bestof/' + $scope.selectedDecade.decade,
+      method: 'GET'
+    }).then(res => {
+      console.log("best movies: ", res.data);
+      $scope.bestofMovies = res.data;
+    }, err => {
+      console.log("Best Movie ERROR: ", err);
+    });
   }
 });
 
@@ -115,40 +135,40 @@ app.controller('bestofController', function($scope, $http) {
 app.controller('postersController', function($scope, $http) {
   // TODO: Q3
   $http({
-	  url: '/random',
-	  method: 'GET'
-	}).then(res => {
-	  console.log("posters: ", res.data);
-	  var data = res.data;
+    url: '/random',
+    method: 'GET'
+  }).then(res => {
+    console.log("posters: ", res.data);
+    var data = res.data;
 
-	  var apiKey = 'b9da2ebd';
+    var apiKey = 'b9da2ebd';
 
-		posterData = [];
+    posterData = [];
 
-		for (var index in data) {
-			d = data[index];
-			console.log(d)
-			$http({
-		  	url: 'http://www.omdbapi.com/?i=' + d.imdb_id + '&apikey=' + apiKey,
-		  	method: 'GET'
-			}).then(res => {
-			  console.log("api request: ", res.data);
-			  posterData.push(res.data);
-			}, err => {
-			  console.log("API ERROR: ", err);
-			});
-	  }
+    for (var index in data) {
+      d = data[index];
+      console.log(d)
+      $http({
+        url: 'http://www.omdbapi.com/?i=' + d.imdb_id + '&apikey=' + apiKey,
+        method: 'GET'
+      }).then(res => {
+        console.log("api request: ", res.data);
+        posterData.push(res.data);
+      }, err => {
+        console.log("API ERROR: ", err);
+      });
+    }
 
-	  $scope.posterData = posterData
-	  console.log(posterData.length)
+    $scope.posterData = posterData
+    console.log(posterData.length)
 
-	  
-	  // $scope.rowPosters = rowPosters;
-	  // $scope.posterData2 = posterData;
+    
+    // $scope.rowPosters = rowPosters;
+    // $scope.posterData2 = posterData;
 
-	  // console.log(posterData.length);
+    // console.log(posterData.length);
 
-	 // 			<div class="movie" id="results" ng-repeat="posterData in rowPosters">
+   //       <div class="movie" id="results" ng-repeat="posterData in rowPosters">
    //          <div class="row" id="rowResults" ng-repeat="poster in posterData">
    //            <div class="column" ng-if="poster.Website != 'N/A'">
    //              <a ng-href="{{poster.Website}}" target="_blank"><img ng-src="{{poster.Poster}}" ng-alt="{{poster.Title}}" width="200" height="300"></a>
@@ -158,7 +178,7 @@ app.controller('postersController', function($scope, $http) {
    //            </div>
    //          </div>
    //        </div>
-	}, err => {
-	  console.log("Poster ERROR: ", err);
-	});
+  }, err => {
+    console.log("Poster ERROR: ", err);
+  });
 });

@@ -1,14 +1,20 @@
 var express = require('express');
 var router = express.Router();
 var path = require('path');
-var config = require('../db-config.js');
 
 /* ----- Connects to your mySQL database ----- */
 
-var mysql = require('mysql');
+const oracledb = require('oracledb');
 
-config.connectionLimit = 10;
-var connection = mysql.createPool(config);
+oracledb.outFormat = oracledb.OBJECT;
+
+const connection = oracledb.getConnection(
+  {
+    user          : "admin",
+    password      : "csproject",
+    connectString : "(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=cis550proj.ciqjdoooctaw.us-east-2.rds.amazonaws.com)(PORT=1521))(CONNECT_DATA=(SID=CIS550)))"
+  }
+);
 
 /* ------------------------------------------- */
 /* ----- Routers to handle FILE requests ----- */
@@ -55,22 +61,24 @@ router.get('<PATH>', function(req, res) {
 
 /* ----- Q1 (Dashboard) ----- */
 
-router.get('/cuisine/:cuisine', function (req, res) {
+router.get('/cuisine/:cuisine/:score/:rating/:price', function (req, res) {
   var cuisine = req.params.cuisine;
+  var score = req.params.score;
+  var rating = req.params.rating;
+  var price = req.params.price;
 
-  var query = "SELECT title, rating, vote_count FROM Genres g, Movies m WHERE g.movie_id = m.id \
-  AND genre = '" + cuisine + "' ORDER BY rating DESC, vote_count DESC LIMIT 10";
+  // const result = await connection.execute(
+  //   "SELECT r.name \
+  //   FROM Inspection i JOIN Restaurant r ON i.CAMIS = r.CAMIS \
+  //   WHERE i.CUISINE_DESCRIPTION LIKE '%" + cuisine + "%' AND i.SCORE < :filter1 AND r.rating > :filter2 AND r.price < :filter3",
+  //   [score, rating, price]
+  //   );
 
-  connection.query(query, function (err, rows, fields) {
-    if (err) console.log(err);
-    else {
-      console.log(rows);
-      res.json(rows);
-    }
-  });
+  console.log(result.rows);
+  res.json(result.rows);
 });
 
-router.get('/cuisineNeighborhood/:cuisine', function (req, res) {
+router.get('/cuisineNeighborhood/:cuisine/:score/:rating/:price', function (req, res) {
   var cuisine = req.params.cuisine;
 
   var query = "SELECT title, rating, vote_count FROM Genres g, Movies m WHERE g.movie_id = m.id \

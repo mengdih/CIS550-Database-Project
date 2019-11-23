@@ -13,6 +13,17 @@
   outline: none;
 }
 
+.input-container .filter-input {
+  margin: 10px 0;
+  width: 100px;
+  height: 36px;
+  border: none;
+  padding: 2px 16px;
+  box-sizing: border-box;
+  border-radius: 20px;
+  outline: none;
+}
+
 .input-container .submit-btn {
   margin-left: 10px;
   width: 250px;
@@ -26,6 +37,16 @@
   color: #fff;
   cursor: pointer;
   font-size: 12px;
+}
+
+.centered {
+  margin: 10px 0;
+  height: 36px;
+  border: none;
+  padding: 2px 16px;
+  box-sizing: border-box;
+  border-radius: 20px;
+  outline: none;
 }
 
 /* .movies-container {

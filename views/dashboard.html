@@ -35,7 +35,13 @@
         <br>
         <div class="input-container">
           <div class="h6">Want more info on a certain Cuisine?</div>
-          <input type="text" ng-model="cuisineName" placeholder="Enter Cuisine" id="cuisineName" class="cuisine-input"/>
+          <div class="row">
+            <input type="text" ng-model="cuisineName" placeholder="Enter Cuisine" id="cuisineName" class="cuisine-input"/>
+            <div class="centered">Filters: </div>
+            <input type="text" ng-model="scoreFilter" placeholder="Score < " id="scoreFilter" class="filter-input"/>
+            <input type="text" ng-model="ratingFilter" placeholder="Rating > " id="ratingFilter" class="filter-input"/>
+            <input type="text" ng-model="priceFilter" placeholder="Price < " id="priceFilter" class="filter-input"/>
+          </div>
           <button id="cuisineDataBtn" class="submit-btn" ng-click="cuisineData()">Comprehensive Cuisine Data</button>
           <button id="cuisineNeighborhoodBtn" class="submit-btn" ng-click="bestNeighborhood()">Find Best Neighborhood for Cuisine</button>
         </div>
