@@ -4,17 +4,23 @@ var path = require('path');
 
 /* ----- Connects to your mySQL database ----- */
 
-const oracledb = require('oracledb');
+const database = require('../services/database.js');
 
-oracledb.outFormat = oracledb.OBJECT;
-
-const connection = oracledb.getConnection(
-  {
-    user          : "admin",
-    password      : "csproject",
-    connectString : "(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=cis550proj.ciqjdoooctaw.us-east-2.rds.amazonaws.com)(PORT=1521))(CONNECT_DATA=(SID=CIS550)))"
+async function startup() {
+  console.log('Starting application');
+ 
+  try {
+    console.log('Initializing database module');
+ 
+    await database.initialize(); 
+  } catch (err) {
+    console.error(err);
+ 
+    process.exit(1); // Non-zero failure code
   }
-);
+}
+ 
+startup();
 
 /* ------------------------------------------- */
 /* ----- Routers to handle FILE requests ----- */
@@ -61,41 +67,92 @@ router.get('<PATH>', function(req, res) {
 
 /* ----- Q1 (Dashboard) ----- */
 
-router.get('/cuisine/:cuisine/:score/:rating/:price', function (req, res) {
+router.get('/cuisine/:cuisine/:score/:rating/:price', async function (req, res) {
   var cuisine = req.params.cuisine;
   var score = req.params.score;
   var rating = req.params.rating;
   var price = req.params.price;
 
+  var query = "WITH T AS ( "
+    + "SELECT i.CAMIS, AVG(i.SCORE) AS AVG_SCORE " 
+    + "FROM Inspection i "
+    + "JOIN Restaurant r ON i.CAMIS = r.CAMIS "
+    + "JOIN Category c ON i.CAMIS = c.CAMIS "
+    + "WHERE GRADE_IMPUTED = 'A' AND r.rating > 3 AND r.price < 3 "
+    + "AND (UPPER(i.CUISINE_DESCRIPTION) LIKE '%" + cuisine.toUpperCase() + "%' OR UPPER(c.categories) LIKE '%" + cuisine.toUpperCase() + "%') "
+    + "GROUP BY i.CAMIS "
+    + ") "
+    + "SELECT r.name, r.address, r.rating, r.price, t.AVG_SCORE "
+    + "FROM T t "
+    + "JOIN Restaurant r ON t.CAMIS = r.CAMIS "
+    + "ORDER BY t.AVG_SCORE ASC "
+
+  console.log(query)
+
+
+  var result = await database.simpleExecute(query);
+
+    console.log(result.rows);
+  res.json(result.rows);
+
+
+
   // const result = await connection.execute(
-  //   "SELECT r.name \
-  //   FROM Inspection i JOIN Restaurant r ON i.CAMIS = r.CAMIS \
-  //   WHERE i.CUISINE_DESCRIPTION LIKE '%" + cuisine + "%' AND i.SCORE < :filter1 AND r.rating > :filter2 AND r.price < :filter3",
-  //   [score, rating, price]
+  //   "WITH T AS ( \
+  //   SELECT i.CAMIS, AVG(i.SCORE) AS AVG_SCORE \
+  //   FROM Inspection i \
+  //   JOIN Restaurant r ON i.CAMIS = r.CAMIS \
+  //   JOIN Category c ON i.CAMIS = c.CAMIS \
+  //   WHERE GRADE_IMPUTED = 'A' AND r.rating > 3 AND r.price < 3 \
+  //   AND (UPPER(i.CUISINE_DESCRIPTION) LIKE '%SALAD%' OR UPPER(c.categories) LIKE '%Salad%') \
+  //   GROUP BY i.CAMIS \
+  //   ) \
+  //   SELECT DISTINCT r.CAMIS, r.name, r.address, r.rating, r.price, t.AVG_SCORE \
+  //   FROM T t \
+  //   JOIN Restaurant r ON t.CAMIS = r.CAMIS \
+  //   ORDER BY t.AVG_SCORE ASC \
+  //   ;"  
+
+
+
+  //   // "SELECT r.name \
+  //   // FROM Inspection i JOIN Restaurant r ON i.CAMIS = r.CAMIS \
+  //   // WHERE i.CUISINE_DESCRIPTION LIKE '%" + cuisine + "%' AND i.SCORE < :filter1 AND r.rating > :filter2 AND r.price < :filter3",
+  //   // [score, rating, price]
   //   );
 
-  console.log(result.rows);
-  res.json(result.rows);
+  // console.log(result.rows);
+  // res.json(result.rows);
 });
 
-router.get('/cuisineNeighborhood/:cuisine/:score/:rating/:price', function (req, res) {
+router.get('/cuisineNeighborhood/:cuisine/:score/:rating/:price', async function (req, res) {
   var cuisine = req.params.cuisine;
+   var score = req.params.score;
+  var rating = req.params.rating;
+  var price = req.params.price;
 
-  var query = "SELECT title, rating, vote_count FROM Genres g, Movies m WHERE g.movie_id = m.id \
-  AND genre = '" + genre + "' ORDER BY rating DESC, vote_count DESC LIMIT 10";
+  var query = "SELECT i.BORO AS BORO, AVG(i.SCORE) AS AVG_SCORE, COUNT(*) as NUM \
+FROM Inspection i \
+JOIN Restaurant r ON i.CAMIS = r.CAMIS \
+JOIN Category c ON i.CAMIS = c.CAMIS \
+WHERE GRADE_IMPUTED = 'A' AND r.rating > 3 AND r.price < 3 \
+AND (UPPER(i.CUISINE_DESCRIPTION) LIKE '%" + cuisine.toUpperCase() + "%' OR c.categories LIKE '%"  + cuisine.toUpperCase() + "%') \
+GROUP BY i.BORO \
+ORDER BY NUM DESC, AVG_SCORE ASC"
 
-  connection.query(query, function (err, rows, fields) {
-    if (err) console.log(err);
-    else {
-      console.log(rows);
-      res.json(rows);
-    }
-  });
+
+console.log(query)
+
+
+  var result = await database.simpleExecute(query);
+
+    console.log(result.rows);
+  res.json(result.rows);
 });
 
 /* ----- Q2 (Recommendations) ----- */
 
-router.get('/recommendations/:movie', function(req, res) {
+router.get('/recommendations/:movie', async function(req, res) {
   var movieName = req.params.movie;
 
   var query = "SELECT title, id, rating, vote_count FROM Movies m JOIN \
@@ -117,7 +174,7 @@ router.get('/recommendations/:movie', function(req, res) {
 
 /* ----- Q3 (Best Of Decades) ----- */
 
-router.get('/decades', function(req, res) {
+router.get('/decades', async function(req, res) {
   var query = "SELECT temp*10 AS decade FROM (SELECT DISTINCT SUBSTRING(release_year, 1, 3) AS temp \
   FROM Movies) decadeStub ORDER BY decade";
 
@@ -130,7 +187,7 @@ router.get('/decades', function(req, res) {
   });
 });
 
-router.get('/bestof/:decade', function(req, res) {
+router.get('/bestof/:decade', async function(req, res) {
   var decade = req.params.decade;
   var decadeEnd = decade.substring(0, decade.length - 1) + 9;
 
@@ -153,7 +210,7 @@ router.get('/bestof/:decade', function(req, res) {
 
 /* ----- Bonus (Posters) ----- */
 
-router.get('/random', function(req, res) {
+router.get('/random', async function(req, res) {
   var numPosters = Math.floor(Math.random() * 6) + 10; 
 
   var query = "SELECT imdb_id FROM Movies ORDER BY RAND() LIMIT " + numPosters + ";";
@@ -186,3 +243,46 @@ router.get('/routeName/:customParameter', function(req, res) {
 
 
 module.exports = router;
+
+async function shutdown(e) {
+  let err = e;
+    
+  console.log('Shutting down');
+ 
+  try {
+    console.log('Closing database module');
+ 
+    await database.close(); 
+  } catch (err) {
+    console.log('Encountered error', e);
+ 
+    err = err || e;
+  }
+ 
+  console.log('Exiting process');
+ 
+  if (err) {
+    process.exit(1); // Non-zero failure code
+  } else {
+    process.exit(0);
+  }
+}
+ 
+process.on('SIGTERM', () => {
+  console.log('Received SIGTERM');
+ 
+  shutdown();
+});
+ 
+process.on('SIGINT', () => {
+  console.log('Received SIGINT');
+ 
+  shutdown();
+});
+ 
+process.on('uncaughtException', err => {
+  console.log('Uncaught exception');
+  console.error(err);
+ 
+  shutdown(err);
+});

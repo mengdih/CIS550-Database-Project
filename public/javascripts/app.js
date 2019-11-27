@@ -27,21 +27,9 @@ app.controller('dashboardController', function($scope, $http) {
   $scope.sortType = 'score'; // set the default sort type
   $scope.sortReverse  = false;  // set the default sort order
 
-  $scope.data = {
-    employees: [{
-      firstName: 'John',
-      lastName: 'Doe',
-      age: 30
-    },{
-      firstName: 'Frank',
-      lastName: 'Burns',
-      age: 54
-    },{
-      firstName: 'Sue',
-      lastName: 'Banter',
-      age: 21
-    }]
-  };
+  console.log("here")
+
+  $scope.cuisineInfo = {};
 
   $scope.cuisineData = function() {
     if($scope.cuisineName != null){
@@ -80,7 +68,7 @@ app.controller('dashboardController', function($scope, $http) {
         method: 'GET'
       }).then(res => {
         console.log("movies: ", res.data);
-        $scope.neighborhood = res.data[0].neighborhood;
+        $scope.neighborhood = res.data[0].BORO;
       }, err => {
         console.log("Movie ERROR: ", err);
       });

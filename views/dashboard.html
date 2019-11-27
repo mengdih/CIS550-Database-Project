@@ -45,7 +45,7 @@
         </div>
         <br>
         <div class="row">
-          <div class="text">Best Neighborhood for Cuisine: </div>
+          <div class="text">Best Neighborhood for Cuisine:  </div>
           <div class="text">{{neighborhood}}</div>
         </div>
       </div>
@@ -59,6 +59,13 @@
           <table class="table table-bordered table-striped">
             <thead>
               <tr>
+                <td>
+                  <a href="#" ng-click="sortType = 'name'; sortReverse = !sortReverse">
+                    Name
+                    <span ng-show="sortType == 'name' && sortReverse" class="fa fa-caret-down"></span>
+                    <span ng-show="sortType == 'name' && !sortReverse" class="fa fa-caret-up"></span>
+                  </a>
+                </td>
                 <td>
                   <a href="#" ng-click="sortType = 'score'; sortReverse = !sortReverse">
                     Inspection Score
@@ -92,10 +99,11 @@
 
             <tbody>
               <tr ng-repeat="cuisine in cuisineInfo | orderBy:sortType:sortReverse">
-                <td>{{cuisine.title}}</td>
-                <td>{{cuisine.id}}</td>
-                <td>{{cuisine.rating}}</td>
-                <td>{{cuisine.vote_count}}</td>
+                <td>{{cuisine.NAME}}</td>
+                <td>{{cuisine.AVG_SCORE}}</td>
+                <td>{{cuisine.RATING}}</td>
+                <td>{{cuisine.PRICE}}</td>
+                <td>{{cuisine.ADDRESS}}</td>
               </tr>
             </tbody>
 
