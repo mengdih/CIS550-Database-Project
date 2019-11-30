@@ -24,7 +24,7 @@ app.controller('dashboardController', function($scope, $http) {
   //   });
  //  }
 
-  $scope.sortType = 'score'; // set the default sort type
+  $scope.sortType = 'AVG_SCORE'; // set the default sort type
   $scope.sortReverse  = false;  // set the default sort order
 
   console.log("here")
@@ -32,14 +32,14 @@ app.controller('dashboardController', function($scope, $http) {
   $scope.cuisineInfo = {};
 
   $scope.cuisineData = function() {
-    if($scope.cuisineName != null){
+    if($scope.cuisineName != null && $scope.cuisineName != ""){
       var score = 100;
       var rating = -1;
       var price = 100;
 
-      if($scope.scoreFilter != null) score = $scope.scoreFilter;
-      if($scope.ratingFilter != null) rating = $scope.ratingFilter;
-      if($scope.priceFilter != null) price = $scope.priceFilter;
+      if($scope.scoreFilter != null && $scope.scoreFilter != "") score = $scope.scoreFilter;
+      if($scope.ratingFilter != null && $scope.ratingFilter != "") rating = $scope.ratingFilter;
+      if($scope.priceFilter != null && $scope.priceFilter != "") price = $scope.priceFilter;
 
       $http({
         url: '/cuisine/' + $scope.cuisineName + '/' + score + '/' + rating + '/' + price,
@@ -54,14 +54,14 @@ app.controller('dashboardController', function($scope, $http) {
   }
 
   $scope.bestNeighborhood = function() {
-    if($scope.cuisineName != null){
+    if($scope.cuisineName != null && $scope.cuisineName != ""){
       var score = 100;
       var rating = -1;
       var price = 100;
 
-      if($scope.scoreFilter != null) score = $scope.scoreFilter;
-      if($scope.ratingFilter != null) rating = $scope.ratingFilter;
-      if($scope.priceFilter != null) price = $scope.priceFilter;
+      if($scope.scoreFilter != null && $scope.scoreFilter != "") score = $scope.scoreFilter;
+      if($scope.ratingFilter != null && $scope.ratingFilter != "") rating = $scope.ratingFilter;
+      if($scope.priceFilter != null && $scope.priceFilter != "") price = $scope.priceFilter;
 
       $http({
         url: '/cuisineNeighborhood/' + $scope.cuisineName + '/' + score + '/' + rating + '/' + price,

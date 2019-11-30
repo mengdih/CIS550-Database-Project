@@ -45,7 +45,7 @@
         </div>
         <br>
         <div class="row">
-          <div class="text">Best Neighborhood for Cuisine:  </div>
+          <div class="text">Best Neighborhood for Cuisine:&nbsp;</div>
           <div class="text">{{neighborhood}}</div>
         </div>
       </div>
@@ -55,48 +55,36 @@
     <div class="container movies-container">
       <div class="jumbotron">
         <!-- Display top 10 movies when a genre is clicked -->
-        <div class="movies-container">
           <table class="table table-bordered table-striped">
             <thead>
               <tr>
-                <td>
-                  <a href="#" ng-click="sortType = 'name'; sortReverse = !sortReverse">
-                    Name
-                    <span ng-show="sortType == 'name' && sortReverse" class="fa fa-caret-down"></span>
-                    <span ng-show="sortType == 'name' && !sortReverse" class="fa fa-caret-up"></span>
+                <th>
+                  <a href="#" ng-click="sortType = 'NAME'; sortReverse = !sortReverse">
+                    Name <span ng-show="sortType == 'NAME'"><span ng-show="!sortReverse">&#9650;</span><span ng-show="sortReverse">&#9660;</span></span>
                   </a>
-                </td>
-                <td>
-                  <a href="#" ng-click="sortType = 'score'; sortReverse = !sortReverse">
-                    Inspection Score
-                    <span ng-show="sortType == 'score' && sortReverse" class="fa fa-caret-down"></span>
-                    <span ng-show="sortType == 'score' && !sortReverse" class="fa fa-caret-up"></span>
+                </th>
+                <th>
+                  <a href="#" ng-click="sortType = 'AVG_SCORE'; sortReverse = !sortReverse">
+                    Inspection Score <span ng-show="sortType == 'AVG_SCORE'"><span ng-show="!sortReverse">&#9650;</span><span ng-show="sortReverse">&#9660;</span></span>
                   </a>
-                </td>
-                <td>
-                  <a href="#" ng-click="sortType = 'rating'; sortReverse = !sortReverse">
-                    Rating
-                    <span ng-show="sortType == 'rating' && sortReverse" class="fa fa-caret-down"></span>
-                    <span ng-show="sortType == 'rating' && !sortReverse" class="fa fa-caret-up"></span>
+                </th>
+                <th>
+                  <a href="#" ng-click="sortType = 'RATING'; sortReverse = !sortReverse">
+                    Rating <span ng-show="sortType == 'RATING'"><span ng-show="!sortReverse">&#9650;</span><span ng-show="sortReverse">&#9660;</span></span>
                   </a>
-                </td>
-                <td>
-                  <a href="#" ng-click="sortType = 'price'; sortReverse = !sortReverse">
-                    Price Level
-                    <span ng-show="sortType == 'price' && sortReverse" class="fa fa-caret-down"></span>
-                    <span ng-show="sortType == 'price' && !sortReverse" class="fa fa-caret-up"></span>
+                </th>
+                <th>
+                  <a href="#" ng-click="sortType = 'PRICE'; sortReverse = !sortReverse">
+                    Price Level <span ng-show="sortType == 'PRICE'"><span ng-show="!sortReverse">&#9650;</span><span ng-show="sortReverse">&#9660;</span></span>
                   </a>
-                </td>
-                <td>
-                  <a href="#" ng-click="sortType = 'neighborhood'; sortReverse = !sortReverse">
-                    Neighborhood
-                    <span ng-show="sortType == 'neighborhood' && sortReverse" class="fa fa-caret-down"></span>
-                    <span ng-show="sortType == 'neighborhood' && !sortReverse" class="fa fa-caret-up"></span>
+                </th>
+                <th>
+                  <a href="#" ng-click="sortType = 'ADDRESS'; sortReverse = !sortReverse">
+                    Neighborhood <span ng-show="sortType == 'ADDRESS'"><span ng-show="!sortReverse">&#9650;</span><span ng-show="sortReverse">&#9660;</span></span>
                   </a>
-                </td>
+                </th>
               </tr>
             </thead>
-
             <tbody>
               <tr ng-repeat="cuisine in cuisineInfo | orderBy:sortType:sortReverse">
                 <td>{{cuisine.NAME}}</td>
@@ -106,7 +94,6 @@
                 <td>{{cuisine.ADDRESS}}</td>
               </tr>
             </tbody>
-
           </table>
 
 <!--           <div class="movie">
@@ -121,7 +108,6 @@
             <div class="rating">{{movie.rating}}</div>
             <div class="vote-count">{{movie.vote_count}}</div>
           </div> -->
-        </div>
       </div>
     </div>
 

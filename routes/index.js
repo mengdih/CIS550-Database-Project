@@ -78,13 +78,14 @@ router.get('/cuisine/:cuisine/:score/:rating/:price', async function (req, res) 
     + "FROM Inspection i "
     + "JOIN Restaurant r ON i.CAMIS = r.CAMIS "
     + "JOIN Category c ON i.CAMIS = c.CAMIS "
-    + "WHERE GRADE_IMPUTED = 'A' AND r.rating > 3 AND r.price < 3 "
+    + "WHERE r.rating > " + rating + " AND r.price < "+ price + " AND SCORE != 'NA'"
     + "AND (UPPER(i.CUISINE_DESCRIPTION) LIKE '%" + cuisine.toUpperCase() + "%' OR UPPER(c.categories) LIKE '%" + cuisine.toUpperCase() + "%') "
     + "GROUP BY i.CAMIS "
     + ") "
     + "SELECT r.name, r.address, r.rating, r.price, t.AVG_SCORE "
     + "FROM T t "
     + "JOIN Restaurant r ON t.CAMIS = r.CAMIS "
+    + "WHERE t.AVG_SCORE < " + score + " "
     + "ORDER BY t.AVG_SCORE ASC "
 
   console.log(query)
