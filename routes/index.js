@@ -89,7 +89,14 @@ router.get('/cuisine/:cuisine/:score/:rating/:price', async function (req, res) 
     + "ORDER BY t.AVG_SCORE ASC "
 
   console.log(query)
-
+  
+// T
+// o
+// O
+// L
+// T
+// I
+// p
 
   var result = await database.simpleExecute(query);
 
@@ -132,14 +139,20 @@ router.get('/cuisineNeighborhood/:cuisine/:score/:rating/:price', async function
   var rating = req.params.rating;
   var price = req.params.price;
 
-  var query = "SELECT i.BORO AS BORO, AVG(i.SCORE) AS AVG_SCORE, COUNT(*) as NUM \
-FROM Inspection i \
-JOIN Restaurant r ON i.CAMIS = r.CAMIS \
-JOIN Category c ON i.CAMIS = c.CAMIS \
-WHERE GRADE_IMPUTED = 'A' AND r.rating > 3 AND r.price < 3 \
-AND (UPPER(i.CUISINE_DESCRIPTION) LIKE '%" + cuisine.toUpperCase() + "%' OR c.categories LIKE '%"  + cuisine.toUpperCase() + "%') \
-GROUP BY i.BORO \
-ORDER BY NUM DESC, AVG_SCORE ASC"
+  var query = "WITH T AS ( "
+    + "SELECT i.CAMIS, AVG(i.SCORE) AS AVG_SCORE, min(BORO) as BORO " 
+    + "FROM Inspection i "
+    + "JOIN Restaurant r ON i.CAMIS = r.CAMIS "
+    + "JOIN Category c ON i.CAMIS = c.CAMIS "
+    + "WHERE r.rating > " + rating + " AND r.price < "+ price + " AND SCORE != 'NA'"
+    + "AND (UPPER(i.CUISINE_DESCRIPTION) LIKE '%" + cuisine.toUpperCase() + "%' OR UPPER(c.categories) LIKE '%" + cuisine.toUpperCase() + "%') "
+    + "GROUP BY i.CAMIS "
+    + ") \
+    SELECT BORO, AVG(AVG_SCORE) AS AVG_SCORE, COUNT(*) as NUM \
+    FROM T t \
+    WHERE t.AVG_SCORE < " + score + " \
+    GROUP BY t.BORO \
+    ORDER BY NUM DESC, AVG_SCORE ASC"
 
 
 console.log(query)

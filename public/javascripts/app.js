@@ -74,6 +74,23 @@ app.controller('dashboardController', function($scope, $http) {
       });
   }
   }
+
+  $scope.globalName = null;
+  $scope.hoverNow = false;
+
+  // TOOLTIP HERE!!!!!!!!!!!!!!
+
+  $scope.hoverIn = function(cuisine){
+      $scope.globalName = cuisine.NAME;
+        $scope.hoverNow = true;
+        console.log($scope.globalName);
+    };
+
+    $scope.hoverOut = function(cuisine){
+      $scope.globalName = null;
+        $scope.hoverNow = false;
+        console.log($scope.globalName);
+    };
 });
 
 // Controller for the Recommendations Page

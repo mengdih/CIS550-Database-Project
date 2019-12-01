@@ -86,12 +86,16 @@
               </tr>
             </thead>
             <tbody>
-              <tr ng-repeat="cuisine in cuisineInfo | orderBy:sortType:sortReverse">
+              <tr ng-repeat="cuisine in cuisineInfo | orderBy:sortType:sortReverse" ng-mouseover="hoverIn(cuisine)" ng-mouseleave="hoverOut(cuisine)">
                 <td>{{cuisine.NAME}}</td>
                 <td>{{cuisine.AVG_SCORE}}</td>
                 <td>{{cuisine.RATING}}</td>
                 <td>{{cuisine.PRICE}}</td>
                 <td>{{cuisine.ADDRESS}}</td>
+<!-- NEEEEDDDD TOOLTIP -->
+                <div ng-if="hoverNow == true">
+                  <div class="h5">TEXT</div>>
+                </div>
               </tr>
             </tbody>
           </table>
