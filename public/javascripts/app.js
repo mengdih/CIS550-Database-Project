@@ -94,20 +94,43 @@ app.controller('dashboardController', function($scope, $http) {
 });
 
 // Controller for the Recommendations Page
-app.controller('recommendationsController', function($scope, $http) {
+app.controller('avoidsController', function($scope, $http) {
   // TODO: Q2
-
-  $scope.submitIds = function() {
+  $scope.options = [{boro:'Staten Island'},{boro:'Manhattan'},{boro:'Bronx'},{boro:'Queens'},{boro:'Brooklyn'}];
+  $scope.locationInfo = {};
+  $scope.submitBoro = function() {
+  var boro = $scope.selectedBoro['boro'];
+  //if($scope.selectedBoro != null || $scope.selectedBoro != ""){
+  console.log("debugging");
+  console.log("selectedBoro: ",$scope.selectedBoro['boro']);
+  //console.log($scope.SelectedBoro.SelectedItem.Text);
     $http({
-      url: '/recommendations/' + $scope.movieName,
+      url: '/recommendations/' + $scope.selectedBoro,
+      // url: '/recommendations/' + $scope.selectedBoro + '/' + boro,
+      // url: '/recommendations/' + boro,
       method: 'GET'
     }).then(res => {
-      console.log("movies: ", res.data);
-      $scope.recommendedMovies = res.data;
+      console.log("location: ", res.data);
+      $scope.locationInfo = res.data;
     }, err => {
-      console.log("Movie ERROR: ", err);
+      console.log("location ERROR: ", err);
     });
-  }
+  //}
+}
+
+$scope.restaurantOutput = function() {
+  $http({
+    url: '/recommendations/' + $scope.movieName,
+    method: 'GET'
+  }).then(res => {
+    console.log("movies: ", res.data);
+    $scope.recommendedMovies = res.data;
+  }, err => {
+    console.log("Movie ERROR: ", err);
+  });
+}
+
+
 });
 
 // Controller for the Best Of Page
@@ -167,7 +190,7 @@ app.controller('postersController', function($scope, $http) {
     $scope.posterData = posterData
     console.log(posterData.length)
 
-    
+
     // $scope.rowPosters = rowPosters;
     // $scope.posterData2 = posterData;
 

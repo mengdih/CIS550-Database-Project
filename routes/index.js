@@ -8,18 +8,18 @@ const database = require('../services/database.js');
 
 async function startup() {
   console.log('Starting application');
- 
+
   try {
     console.log('Initializing database module');
- 
-    await database.initialize(); 
+
+    await database.initialize();
   } catch (err) {
     console.error(err);
- 
+
     process.exit(1); // Non-zero failure code
   }
 }
- 
+
 startup();
 
 /* ------------------------------------------- */
@@ -73,8 +73,9 @@ router.get('/cuisine/:cuisine/:score/:rating/:price', async function (req, res) 
   var rating = req.params.rating;
   var price = req.params.price;
 
+
   var query = "WITH T AS ( "
-    + "SELECT i.CAMIS, AVG(i.SCORE) AS AVG_SCORE " 
+    + "SELECT i.CAMIS, AVG(i.SCORE) AS AVG_SCORE "
     + "FROM Inspection i "
     + "JOIN Restaurant r ON i.CAMIS = r.CAMIS "
     + "JOIN Category c ON i.CAMIS = c.CAMIS "
@@ -89,7 +90,7 @@ router.get('/cuisine/:cuisine/:score/:rating/:price', async function (req, res) 
     + "ORDER BY t.AVG_SCORE ASC "
 
   console.log(query)
-  
+
 // T
 // o
 // O
@@ -119,7 +120,7 @@ router.get('/cuisine/:cuisine/:score/:rating/:price', async function (req, res) 
   //   FROM T t \
   //   JOIN Restaurant r ON t.CAMIS = r.CAMIS \
   //   ORDER BY t.AVG_SCORE ASC \
-  //   ;"  
+  //   ;"
 
 
 
@@ -140,7 +141,7 @@ router.get('/cuisineNeighborhood/:cuisine/:score/:rating/:price', async function
   var price = req.params.price;
 
   var query = "WITH T AS ( "
-    + "SELECT i.CAMIS, AVG(i.SCORE) AS AVG_SCORE, min(BORO) as BORO " 
+    + "SELECT i.CAMIS, AVG(i.SCORE) AS AVG_SCORE, min(BORO) as BORO "
     + "FROM Inspection i "
     + "JOIN Restaurant r ON i.CAMIS = r.CAMIS "
     + "JOIN Category c ON i.CAMIS = c.CAMIS "
@@ -166,24 +167,38 @@ console.log(query)
 
 /* ----- Q2 (Recommendations) ----- */
 
-router.get('/recommendations/:movie', async function(req, res) {
-  var movieName = req.params.movie;
+//router.get('/recommendations/:selectedBoro/:boro', async function(req, res) {
+router.get('/recommendations/:boro', async function(req, res) {
+  var boro = req.params.selectedBoro;
+  console.log("===============");
+  console.log("boro:", boro);
+  var query =`
+      SELECT DISTINCT r.Name, c.BOROUGH, i.INSPECTION_DATE, i.CRITICAL_FLAG
+      FROM INSPECTION i
+      FULL OUTER JOIN RESTAURANT r
+      ON r.CAMIS=i.CAMIS"
+      JOIN COLLISION c
+      ON c.BOROUGH= i.boro
+      WHERE i.BORO =  ${boro}
+      ORDER BY r.Name, i.INSPECTION_DATE DESC;
+      `
+      console.log(query)
 
-  var query = "SELECT title, id, rating, vote_count FROM Movies m JOIN \
-  (SELECT g.movie_id FROM Genres g JOIN (SELECT DISTINCT genre FROM Genres g, Movies m \
-  WHERE g.movie_id = m.id AND m.title = '" + movieName + "') temp on temp.genre = g.genre \
-  GROUP BY g.movie_id HAVING COUNT(*) >= ANY (SELECT COUNT(DISTINCT genre) FROM Genres g, Movies m \
-  WHERE g.movie_id = m.id AND m.title = '" + movieName + "')) goodMovies ON \
-  m.id = goodMovies.movie_id WHERE m.title <> '" + movieName + "' ORDER BY rating DESC, vote_count DESC \
-  LIMIT 5";
 
-  connection.query(query, function (err, rows, fields) {
-    if (err) console.log(err);
-    else {
-      console.log(rows);
-      res.json(rows);
-    }
-  });
+        var result = await database.simpleExecute(query);
+
+        console.log(result.rows);
+        res.json(result.rows);
+  // connection.query(query, function (err, rows, fields) {
+  //   if (err) {
+  //     console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!");
+  //     console.log(err);
+  //   }
+  //   else {
+  //     console.log(rows);
+  //     res.json(rows);
+  //   }
+  // });
 });
 
 /* ----- Q3 (Best Of Decades) ----- */
@@ -225,7 +240,7 @@ router.get('/bestof/:decade', async function(req, res) {
 /* ----- Bonus (Posters) ----- */
 
 router.get('/random', async function(req, res) {
-  var numPosters = Math.floor(Math.random() * 6) + 10; 
+  var numPosters = Math.floor(Math.random() * 6) + 10;
 
   var query = "SELECT imdb_id FROM Movies ORDER BY RAND() LIMIT " + numPosters + ";";
 
@@ -260,43 +275,43 @@ module.exports = router;
 
 async function shutdown(e) {
   let err = e;
-    
+
   console.log('Shutting down');
- 
+
   try {
     console.log('Closing database module');
- 
-    await database.close(); 
+
+    await database.close();
   } catch (err) {
     console.log('Encountered error', e);
- 
+
     err = err || e;
   }
- 
+
   console.log('Exiting process');
- 
+
   if (err) {
     process.exit(1); // Non-zero failure code
   } else {
     process.exit(0);
   }
 }
- 
+
 process.on('SIGTERM', () => {
   console.log('Received SIGTERM');
- 
+
   shutdown();
 });
- 
+
 process.on('SIGINT', () => {
   console.log('Received SIGINT');
- 
+
   shutdown();
 });
- 
+
 process.on('uncaughtException', err => {
   console.log('Uncaught exception');
   console.error(err);
- 
+
   shutdown(err);
 });
