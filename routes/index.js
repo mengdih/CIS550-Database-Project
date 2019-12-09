@@ -2,6 +2,8 @@ var express = require('express');
 var router = express.Router();
 var path = require('path');
 
+//router.use(express.urlencoded({extended: false}));
+
 /* ----- Connects to your mySQL database ----- */
 
 const database = require('../services/database.js');
@@ -169,19 +171,20 @@ console.log(query)
 
 //router.get('/recommendations/:selectedBoro/:boro', async function(req, res) {
 router.get('/recommendations/:boro', async function(req, res) {
-  var boro = req.params.selectedBoro;
+  const boro = req.params.boro;
+
   console.log("===============");
+  console.log('hahaha')
   console.log("boro:", boro);
-  var query =`
-      SELECT DISTINCT r.Name, c.BOROUGH, i.INSPECTION_DATE, i.CRITICAL_FLAG
-      FROM INSPECTION i
-      FULL OUTER JOIN RESTAURANT r
-      ON r.CAMIS=i.CAMIS"
-      JOIN COLLISION c
-      ON c.BOROUGH= i.boro
-      WHERE i.BORO =  ${boro}
-      ORDER BY r.Name, i.INSPECTION_DATE DESC;
-      `
+  var query =
+      "SELECT DISTINCT r.Name, c.BOROUGH, i.INSPECTION_DATE, i.CRITICAL_FLAG " +
+      "FROM INSPECTION i " +
+      "FULL OUTER JOIN RESTAURANT r " +
+      "ON r.CAMIS=i.CAMIS " +
+      "JOIN COLLISION c " +
+      "ON c.BOROUGH= i.boro " +
+      "WHERE i.BORO = '" + boro.toUpperCase() +
+      "' ORDER BY r.Name, i.INSPECTION_DATE DESC"
       console.log(query)
 
 
@@ -305,8 +308,7 @@ process.on('SIGTERM', () => {
 
 process.on('SIGINT', () => {
   console.log('Received SIGINT');
-
-  shutdown();
+  process.exit(0);
 });
 
 process.on('uncaughtException', err => {

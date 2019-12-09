@@ -99,15 +99,15 @@ app.controller('avoidsController', function($scope, $http) {
   $scope.options = [{boro:'Staten Island'},{boro:'Manhattan'},{boro:'Bronx'},{boro:'Queens'},{boro:'Brooklyn'}];
   $scope.locationInfo = {};
   $scope.submitBoro = function() {
-  var boro = $scope.selectedBoro['boro'];
+  const boro = $scope.selectedBoro['boro'];
   //if($scope.selectedBoro != null || $scope.selectedBoro != ""){
   console.log("debugging");
-  console.log("selectedBoro: ",$scope.selectedBoro['boro']);
-  //console.log($scope.SelectedBoro.SelectedItem.Text);
+  //console.log("selectedBoro: ",$scope.selectedBoro['boro']);
+  console.log("selectedBoro: ", boro);
     $http({
-      url: '/recommendations/' + $scope.selectedBoro,
+      //url: '/recommendations/' + $scope.selectedBoro,
       // url: '/recommendations/' + $scope.selectedBoro + '/' + boro,
-      // url: '/recommendations/' + boro,
+      url: '/recommendations/' + boro,
       method: 'GET'
     }).then(res => {
       console.log("location: ", res.data);
