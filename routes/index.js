@@ -43,8 +43,8 @@ router.get('/bestof', function(req, res) {
 });
 
 /* ----- Bonus (Posters) ----- */
-router.get('/posters', function(req, res) {
-  res.sendFile(path.join(__dirname, '../', 'views', 'posters.html'));
+router.get('/collision', function(req, res) {
+  res.sendFile(path.join(__dirname, '../', 'views', 'collisions.html'));
 });
 
 router.get('/reference', function(req, res) {
@@ -242,18 +242,32 @@ router.get('/bestof/:decade', async function(req, res) {
 
 /* ----- Bonus (Posters) ----- */
 
-router.get('/random', async function(req, res) {
-  var numPosters = Math.floor(Math.random() * 6) + 10;
+router.get('/collisions/:minViolations', async function (req, res) {
+  var minViolations = req.params.minViolations;
 
-  var query = "SELECT imdb_id FROM Movies ORDER BY RAND() LIMIT " + numPosters + ";";
+  var query = ""
++ "SELECT AVG(rating) as avgRating, min(contributing_factor_vehicle_2) as contributing_factor FROM "
++ "(SELECT r.zipcode, rating FROM restaurant r join inspection i on r.camis = i.camis) r2 JOIN "
++ "(SELECT zip_code, contributing_factor_vehicle_2 FROM "
++ "(SELECT zip_code, ROWNUM as RN, contributing_factor_vehicle_2 FROM "
++ "(SELECT zip_code, count(*), min(c2.contributing_factor_vehicle_2) as contributing_factor_vehicle_2 FROM Collision c2 JOIN "
++ "(SELECT contributing_factor_vehicle_2 FROM "
++ "(Select contributing_factor_vehicle_2, ROWNUM as RN FROM "
++ "(SELECT contributing_factor_vehicle_2, count(*) as count FROM Collision c JOIN "
++ "  (SELECT DISTINCT zipcode as zipcode FROM "
++ "    (SELECT camis, count(DISTINCT violation_code) as numViolations, min(zipcode) as zipcode "
++ "      FROM inspection i GROUP BY camis "
++ "      HAVING count(DISTINCT violation_code) >= " + minViolations + " )) zips "
++ "  on c.ZIP_CODE = zips.zipcode where contributing_factor_vehicle_2 is not null group by contributing_factor_vehicle_2 order by count(*) DESC)) where RN = 2) maxVeh "
++ "ON c2.contributing_factor_vehicle_2 = maxVeh.contributing_factor_vehicle_2 GROUP BY zip_code order by count(*) DESC)) WHERE RN >= 30) zips "
++ "on r2.zipcode = zips.zip_code"
 
-  connection.query(query, function (err, rows, fields) {
-    if (err) console.log(err);
-    else {
-      console.log(rows);
-      res.json(rows);
-    }
-  });
+console.log(query)
+
+  var result = await database.simpleExecute(query);
+
+    console.log(result.rows);
+  res.json(result.rows);
 });
 
 /* General Template for GET requests:

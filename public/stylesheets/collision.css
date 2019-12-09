@@ -1,0 +1,52 @@
+.collisions-container {
+  margin-top: 2rem;
+  margin-left: 250px;
+  text-align: center;
+}
+
+.input-container .collision-input {
+  margin: 10px 0;
+  width: 350px;
+  height: 36px;
+  border: none;
+  padding: 2px 16px;
+  box-sizing: border-box;
+  border-radius: 20px;
+  outline: none;
+  justify-content: center;
+}
+
+.input-container .submit-btn {
+  margin-left: 10px;
+  width: 150px;
+  height: 36px;
+  border: none;
+  padding: 2px 16px;
+  box-sizing: border-box;
+  border-radius: 20px;
+  outline: none;
+  background: #bd54a4;
+  color: #fff;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.centered-row {
+  justify-content: center;
+  text-align: center;
+}
+
+.centered {
+  margin: 10px 0;
+  height: 36px;
+  border: none;
+  padding: 2px 16px;
+  box-sizing: border-box;
+  border-radius: 20px;
+  outline: none;
+}
+
+.navbar-default {
+    background-color: #F8F8F8;
+    border-color: #E7E7E7;
+}

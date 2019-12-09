@@ -159,54 +159,20 @@ app.controller('bestofController', function($scope, $http) {
   }
 });
 
-// Controller for the Poster Page
-app.controller('postersController', function($scope, $http) {
-  // TODO: Q3
-  $http({
-    url: '/random',
-    method: 'GET'
-  }).then(res => {
-    console.log("posters: ", res.data);
-    var data = res.data;
-
-    var apiKey = 'b9da2ebd';
-
-    posterData = [];
-
-    for (var index in data) {
-      d = data[index];
-      console.log(d)
+// Controller for the Collisions Page
+app.controller('collisionController', function($scope, $http) {
+  $scope.collisionsData = function() {
+    if($scope.minViolations != null && $scope.minViolations != ""){
       $http({
-        url: 'http://www.omdbapi.com/?i=' + d.imdb_id + '&apikey=' + apiKey,
+        url: '/collisions/' + $scope.minViolations,
         method: 'GET'
       }).then(res => {
-        console.log("api request: ", res.data);
-        posterData.push(res.data);
+        console.log("movies: ", res.data);
+        $scope.rating = res.data[0].AVGRATING;
+        $scope.factor = res.data[0].CONTRIBUTING_FACTOR;
       }, err => {
-        console.log("API ERROR: ", err);
+        console.log("Movie ERROR: ", err);
       });
-    }
-
-    $scope.posterData = posterData
-    console.log(posterData.length)
-
-
-    // $scope.rowPosters = rowPosters;
-    // $scope.posterData2 = posterData;
-
-    // console.log(posterData.length);
-
-   //       <div class="movie" id="results" ng-repeat="posterData in rowPosters">
-   //          <div class="row" id="rowResults" ng-repeat="poster in posterData">
-   //            <div class="column" ng-if="poster.Website != 'N/A'">
-   //              <a ng-href="{{poster.Website}}" target="_blank"><img ng-src="{{poster.Poster}}" ng-alt="{{poster.Title}}" width="200" height="300"></a>
-   //            </div>
-   //            <div class="column" ng-if="poster.Website == 'N/A'">
-   //              <img ng-src="{{poster.Poster}}" ng-alt="{{poster.Title}}" width="200" height="300">
-   //            </div>
-   //          </div>
-   //        </div>
-  }, err => {
-    console.log("Poster ERROR: ", err);
-  });
+  }
+  }
 });
