@@ -177,14 +177,24 @@ router.get('/recommendations/:boro', async function(req, res) {
   console.log('hahaha')
   console.log("boro:", boro);
   var query =
-      "SELECT DISTINCT r.Name, c.BOROUGH, i.INSPECTION_DATE, i.CRITICAL_FLAG " +
-      "FROM INSPECTION i " +
-      "FULL OUTER JOIN RESTAURANT r " +
-      "ON r.CAMIS=i.CAMIS " +
-      "JOIN COLLISION c " +
-      "ON c.BOROUGH= i.boro " +
-      "WHERE i.BORO = '" + boro.toUpperCase() +
-      "' ORDER BY r.Name, i.INSPECTION_DATE DESC"
+  "SELECT * "+
+  "FROM "+
+"(SELECT X.Name, X.CUISINE_DESCRIPTION, X.INSPECTION_DATE, X.CRITICAL_FLAG, Z.LOW "+
+  "FROM "+
+"(SELECT DISTINCT r.CAMIS, r.Name, i.CUISINE_DESCRIPTION, i.INSPECTION_DATE, i.CRITICAL_FLAG, i.SCORE "+
+"FROM INSPECTION i, RESTAURANT r, COLLISION c " +
+"WHERE r.CAMIS=i.CAMIS AND c.BOROUGH=i.BORO AND i.BORO='" + boro.toUpperCase() + "' AND CRITICAL_FLAG != 'Not Applicable') X, "+
+"(SELECT r.CAMIS, COUNT(VIOLATION_CODE) as count "+
+"FROM INSPECTION i, RESTAURANT r, COLLISION c " +
+"WHERE r.CAMIS=i.CAMIS AND c.BOROUGH=i.BORO AND i.BORO='" + boro.toUpperCase() + "' AND CRITICAL_FLAG != 'Not Applicable' "+
+"GROUP BY r.CAMIS) Y, "+
+"(SELECT r.CAMIS, min(i.SCORE) as low "+
+"FROM INSPECTION i, RESTAURANT r, COLLISION c "+
+"WHERE r.CAMIS=i.CAMIS AND c.BOROUGH=i.BORO AND i.BORO='" + boro.toUpperCase() + "' AND CRITICAL_FLAG != 'Not Applicable' AND SCORE !='NA' "+
+"GROUP BY r.CAMIS) Z " +
+"WHERE X.CAMIS=Y.CAMIS AND X.CAMIS=Z.CAMIS AND X.SCORE=Z.low "+
+"ORDER BY Y.count ASC, X.SCORE DESC) " +
+"WHERE ROWNUM <=20"
       console.log(query)
 
 
@@ -192,6 +202,48 @@ router.get('/recommendations/:boro', async function(req, res) {
 
         console.log(result.rows);
         res.json(result.rows);
+  // connection.query(query, function (err, rows, fields) {
+  //   if (err) {
+  //     console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!");
+  //     console.log(err);
+  //   }
+  //   else {
+  //     console.log(rows);
+  //     res.json(rows);
+  //   }
+  // });
+});
+router.get('/violation/:restaurantName', async function(req, res) {
+  const pubName = req.params.restaurantName;
+
+  console.log("===============");
+  console.log('hahaha')
+  console.log("pubName:", pubName);
+  var query =
+  "SELECT * "+
+    "FROM( "+
+"SELECT  Y.count, X.VIOLATION_DESCRIPTION "+
+"FROM "+
+"(SELECT DISTINCT r.CAMIS, r.Name, i.CUISINE_DESCRIPTION, i.INSPECTION_DATE, i.CRITICAL_FLAG, i.SCORE, i.VIOLATION_DESCRIPTION "+
+"FROM INSPECTION i, RESTAURANT r "+
+"WHERE r.CAMIS=i.CAMIS AND r.Name='" + pubName + "'AND CRITICAL_FLAG != 'Not Applicable') X, "+
+"(SELECT r.CAMIS, r.Name, r.ZIPCODE, COUNT(*) as count "+
+"FROM INSPECTION i, RESTAURANT r "+
+"WHERE r.CAMIS=i.CAMIS AND r.Name='" + pubName + "'AND CRITICAL_FLAG != 'Not Applicable' "+
+"GROUP BY r.CAMIS, r.Name, r.ZIPCODE) Y, "+
+"(SELECT r.CAMIS, max(i.INSPECTION_DATE) as recent "+
+"FROM INSPECTION i, RESTAURANT r "+
+"WHERE r.CAMIS=i.CAMIS AND r.Name='" + pubName + "'AND CRITICAL_FLAG != 'Not Applicable' AND SCORE !='NA' "+
+"GROUP BY r.CAMIS) Z "+
+"WHERE X.CAMIS=Y.CAMIS AND X.CAMIS=Z.CAMIS AND X.INSPECTION_DATE=Z.recent "+
+"ORDER BY X.VIOLATION_DESCRIPTION DESC, Z.recent) "+
+"WHERE ROWNUM=1"
+
+
+console.log(query)
+var result = await database.simpleExecute(query);
+console.log(result.rows);
+res.json(result.rows);
   // connection.query(query, function (err, rows, fields) {
   //   if (err) {
   //     console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!");

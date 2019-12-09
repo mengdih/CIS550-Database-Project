@@ -68,23 +68,23 @@
                     </a>
                   </th>
                   <th>
-                    <a href="#" ng-click="sortType = 'AVG_SCORE'; sortReverse = !sortReverse">
-                      Cuisine Description <span ng-show="sortType == 'AVG_SCORE'"><span ng-show="!sortReverse">&#9650;</span><span ng-show="sortReverse">&#9660;</span></span>
+                    <a href="#" ng-click="sortType = 'CUISINE_DESCRIPTION'; sortReverse = !sortReverse">
+                      Cuisine Description <span ng-show="sortType == 'CUISINE_DESCRIPTION'"><span ng-show="!sortReverse">&#9650;</span><span ng-show="sortReverse">&#9660;</span></span>
                     </a>
                   </th>
                   <th>
-                    <a href="#" ng-click="sortType = 'RATING'; sortReverse = !sortReverse">
-                      Inspection Date <span ng-show="sortType == 'RATING'"><span ng-show="!sortReverse">&#9650;</span><span ng-show="sortReverse">&#9660;</span></span>
+                    <a href="#" ng-click="sortType = 'INSPECTION_DATE'; sortReverse = !sortReverse">
+                      Inspection Date <span ng-show="sortType == 'INSPECTION_DATE'"><span ng-show="!sortReverse">&#9650;</span><span ng-show="sortReverse">&#9660;</span></span>
                     </a>
                   </th>
                   <th>
-                    <a href="#" ng-click="sortType = 'PRICE'; sortReverse = !sortReverse">
-                      Critical Flag <span ng-show="sortType == 'PRICE'"><span ng-show="!sortReverse">&#9650;</span><span ng-show="sortReverse">&#9660;</span></span>
+                    <a href="#" ng-click="sortType = 'CRITICAL_FLAG'; sortReverse = !sortReverse">
+                      Critical Flag <span ng-show="sortType == 'CRITICAL_FLAG'"><span ng-show="!sortReverse">&#9650;</span><span ng-show="sortReverse">&#9660;</span></span>
                     </a>
                   </th>
                   <th>
-                    <a href="#" ng-click="sortType = 'ADDRESS'; sortReverse = !sortReverse">
-                      Inspection Score <span ng-show="sortType == 'ADDRESS'"><span ng-show="!sortReverse">&#9650;</span><span ng-show="sortReverse">&#9660;</span></span>
+                    <a href="#" ng-click="sortType = 'LOW'; sortReverse = !sortReverse">
+                      Inspection Score <span ng-show="sortType == 'LOW'"><span ng-show="!sortReverse">&#9650;</span><span ng-show="sortReverse">&#9660;</span></span>
                     </a>
                   </th>
                 </tr>
@@ -92,10 +92,10 @@
               <tbody>
                 <tr ng-repeat="l in locationInfo | orderBy:sortType:sortReverse" ng-mouseover="hoverIn(cuisine)" ng-mouseleave="hoverOut(cuisine)">
                   <td>{{l.NAME}}</td>
-                  <td>{{l.AVG_SCORE}}</td>
-                  <td>{{l.RATING}}</td>
-                  <td>{{l.PRICE}}</td>
-                  <td>{{l.ADDRESS}}</td>
+                  <td>{{l.CUISINE_DESCRIPTION}}</td>
+                  <td>{{l.INSPECTION_DATE}}</td>
+                  <td>{{l.CRITICAL_FLAG}}</td>
+                  <td>{{l.LOW}}</td>
   <!-- NEEEEDDDD TOOLTIP -->
   <!--                 <div ng-if="hoverNow == true">
                     <div class="h5">TEXT</div>>
@@ -124,13 +124,13 @@
               <thead>
                 <tr>
                   <th>
-                    <a href="#" ng-click="sortType = 'NAME'; sortReverse = !sortReverse">
-                      Number Of Violations <span ng-show="sortType == 'NAME'"><span ng-show="!sortReverse">&#9650;</span><span ng-show="sortReverse">&#9660;</span></span>
+                    <a href="#" ng-click="sortType = 'COUNT'; sortReverse = !sortReverse">
+                      Number Of Violations <span ng-show="sortType == 'COUNT'"><span ng-show="!sortReverse">&#9650;</span><span ng-show="sortReverse">&#9660;</span></span>
                     </a>
                   </th>
                   <th>
-                    <a href="#" ng-click="sortType = 'AVG_SCORE'; sortReverse = !sortReverse">
-                      Violation Description <span ng-show="sortType == 'AVG_SCORE'"><span ng-show="!sortReverse">&#9650;</span><span ng-show="sortReverse">&#9660;</span></span>
+                    <a href="#" ng-click="sortType = 'VIOLATION_DESCRIPTION'; sortReverse = !sortReverse">
+                      Violation Description <span ng-show="sortType == 'VIOLATION_DESCRIPTION'"><span ng-show="!sortReverse">&#9650;</span><span ng-show="sortReverse">&#9660;</span></span>
                     </a>
                   </th>
                   <!-- <th>
@@ -151,13 +151,10 @@
                 </tr>
               </thead>
               <tbody>
-                <tr ng-repeat="cuisine in cuisineInfo | orderBy:sortType:sortReverse" ng-mouseover="hoverIn(cuisine)" ng-mouseleave="hoverOut(cuisine)">
-                  <td>{{cuisine.NAME}}</td>
-                  <td>{{cuisine.AVG_SCORE}}</td>
-                  <td>{{cuisine.RATING}}</td>
-                  <td>{{cuisine.PRICE}}</td>
-                  <td>{{cuisine.ADDRESS}}</td>
-  <!-- NEEEEDDDD TOOLTIP -->
+                <tr ng-repeat="v in violationInfo | orderBy:sortType:sortReverse" ng-mouseover="hoverIn(cuisine)" ng-mouseleave="hoverOut(cuisine)">
+                  <td>{{v.COUNT}}</td>
+                  <td>{{v.VIOLATION_DESCRIPTION}}</td>
+
   <!--                 <div ng-if="hoverNow == true">
                     <div class="h5">TEXT</div>>
                   </div> -->

@@ -105,8 +105,6 @@ app.controller('avoidsController', function($scope, $http) {
   //console.log("selectedBoro: ",$scope.selectedBoro['boro']);
   console.log("selectedBoro: ", boro);
     $http({
-      //url: '/recommendations/' + $scope.selectedBoro,
-      // url: '/recommendations/' + $scope.selectedBoro + '/' + boro,
       url: '/recommendations/' + boro,
       method: 'GET'
     }).then(res => {
@@ -117,14 +115,16 @@ app.controller('avoidsController', function($scope, $http) {
     });
   //}
 }
-
-$scope.restaurantOutput = function() {
+  $scope.violationInfo = {};
+  $scope.cuisineData = function() {
+    const restaurantName = $scope.RestaurantName;
+    console.log("restaurantName: ",restaurantName);
   $http({
-    url: '/recommendations/' + $scope.movieName,
+    url: '/violation/' + restaurantName,
     method: 'GET'
   }).then(res => {
-    console.log("movies: ", res.data);
-    $scope.recommendedMovies = res.data;
+    console.log("violationInfo: ", res.data);
+    $scope.violationInfo = res.data;
   }, err => {
     console.log("Movie ERROR: ", err);
   });
