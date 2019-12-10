@@ -109,17 +109,15 @@ app.controller('avoidsController', function($scope, $http) {
 app.controller('collisionController', function($scope, $http) {
   // function to return the average rating of all restaurants in neighborhoods with similar collisions, as well as the contributing factor
   $scope.collisionsData = function() {
-   if($scope.minViolations != null && $scope.minViolations != ""){
     $http({
       url: '/collisions/' + $scope.minViolation,
       method: 'GET'
     }).then(res => {
       console.log("Summary statistics: ", res.data);
-        $scope.rating = res.data[0].AVGRATING.toFixed(3);
-        $scope.factor = res.data[0].CONTRIBUTING_FACTOR;
+      $scope.rating = res.data[0].AVGRATING.toFixed(3);
+      $scope.factor = res.data[0].CONTRIBUTING_FACTOR;
       }, err => {
         console.log("Collision ERROR: ", err);
       });
-  }
 }
 });
