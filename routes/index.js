@@ -2,12 +2,10 @@ var express = require('express');
 var router = express.Router();
 var path = require('path');
 
-//router.use(express.urlencoded({extended: false}));
-
-/* ----- Connects to your mySQL database ----- */
-
+// require file for connecting to oracleDB
 const database = require('../services/database.js');
 
+// function to invote on startup, initializes oracleDB database
 async function startup() {
   console.log('Starting application');
 
@@ -32,43 +30,24 @@ router.get('/', function(req, res) {
   res.sendFile(path.join(__dirname, '../', 'views', 'dashboard.html'));
 });
 
-/* ----- Q2 (Recommendations) ----- */
-router.get('/recommendations', function(req, res) {
-  res.sendFile(path.join(__dirname, '../', 'views', 'recommendations.html'));
+/* ----- Q2 (Avoids) ----- */
+router.get('/avoids', function(req, res) {
+  res.sendFile(path.join(__dirname, '../', 'views', 'avoids.html'));
 });
 
-/* ----- Q3 (Best Of Decades) ----- */
-router.get('/bestof', function(req, res) {
-  res.sendFile(path.join(__dirname, '../', 'views', 'bestof.html'));
-});
-
-/* ----- Bonus (Posters) ----- */
+/* ----- Collisions ----- */
 router.get('/collision', function(req, res) {
   res.sendFile(path.join(__dirname, '../', 'views', 'collisions.html'));
 });
-
-router.get('/reference', function(req, res) {
-  res.sendFile(path.join(__dirname, '../', 'views', 'reference.html'));
-});
-
-/* Template for a FILE request router:
-
-Specifies that when the app recieves a GET request at <PATH>,
-it should respond by sending file <MY_FILE>
-
-router.get('<PATH>', function(req, res) {
-  res.sendFile(path.join(__dirname, '../', 'views', '<MY_FILE>'));
-});
-
-*/
 
 
 /* ------------------------------------------------ */
 /* ----- Routers to handle data requests ----- */
 /* ------------------------------------------------ */
 
-/* ----- Q1 (Dashboard) ----- */
+/* ----- P1 (Cuisine/Dashboard) ----- */
 
+// function for querying all restaurants with a certain cuisine
 router.get('/cuisine/:cuisine/:score/:rating/:price', async function (req, res) {
   var cuisine = req.params.cuisine;
   var score = req.params.score;
@@ -77,271 +56,160 @@ router.get('/cuisine/:cuisine/:score/:rating/:price', async function (req, res) 
 
 
   var query = "WITH T AS ( "
-    + "SELECT i.CAMIS, AVG(i.SCORE) AS AVG_SCORE "
-    + "FROM Inspection i "
-    + "JOIN Restaurant r ON i.CAMIS = r.CAMIS "
-    + "JOIN Category c ON i.CAMIS = c.CAMIS "
-    + "WHERE r.rating > " + rating + " AND r.price < "+ price + " AND SCORE != 'NA'"
-    + "AND (UPPER(i.CUISINE_DESCRIPTION) LIKE '%" + cuisine.toUpperCase() + "%' OR UPPER(c.categories) LIKE '%" + cuisine.toUpperCase() + "%') "
-    + "GROUP BY i.CAMIS "
-    + ") "
-    + "SELECT r.name, r.address, r.rating, r.price, t.AVG_SCORE "
-    + "FROM T t "
-    + "JOIN Restaurant r ON t.CAMIS = r.CAMIS "
-    + "WHERE t.AVG_SCORE < " + score + " "
-    + "ORDER BY t.AVG_SCORE ASC "
+  + "SELECT i.CAMIS, AVG(i.SCORE) AS AVG_SCORE "
+  + "FROM Inspection i "
+  + "JOIN Restaurant r ON i.CAMIS = r.CAMIS "
+  + "JOIN Category c ON i.CAMIS = c.CAMIS "
+  + "WHERE r.rating > " + rating + " AND r.price < "+ price + " AND SCORE != 'NA'"
+  + "AND (UPPER(i.CUISINE_DESCRIPTION) LIKE '%" + cuisine.toUpperCase() + "%' OR UPPER(c.categories) LIKE '%" + cuisine.toUpperCase() + "%') "
+  + "GROUP BY i.CAMIS "
+  + ") "
+  + "SELECT r.name, r.address, r.rating, r.price, t.AVG_SCORE "
+  + "FROM T t "
+  + "JOIN Restaurant r ON t.CAMIS = r.CAMIS "
+  + "WHERE t.AVG_SCORE < " + score + " "
+  + "ORDER BY t.AVG_SCORE ASC "
 
   console.log(query)
 
-// T
-// o
-// O
-// L
-// T
-// I
-// p
+var result = await database.simpleExecute(query);
 
-  var result = await database.simpleExecute(query);
+console.log(result.rows);
+res.json(result.rows);
 
-    console.log(result.rows);
-  res.json(result.rows);
-
-
-
-  // const result = await connection.execute(
-  //   "WITH T AS ( \
-  //   SELECT i.CAMIS, AVG(i.SCORE) AS AVG_SCORE \
-  //   FROM Inspection i \
-  //   JOIN Restaurant r ON i.CAMIS = r.CAMIS \
-  //   JOIN Category c ON i.CAMIS = c.CAMIS \
-  //   WHERE GRADE_IMPUTED = 'A' AND r.rating > 3 AND r.price < 3 \
-  //   AND (UPPER(i.CUISINE_DESCRIPTION) LIKE '%SALAD%' OR UPPER(c.categories) LIKE '%Salad%') \
-  //   GROUP BY i.CAMIS \
-  //   ) \
-  //   SELECT DISTINCT r.CAMIS, r.name, r.address, r.rating, r.price, t.AVG_SCORE \
-  //   FROM T t \
-  //   JOIN Restaurant r ON t.CAMIS = r.CAMIS \
-  //   ORDER BY t.AVG_SCORE ASC \
-  //   ;"
-
-
-
-  //   // "SELECT r.name \
-  //   // FROM Inspection i JOIN Restaurant r ON i.CAMIS = r.CAMIS \
-  //   // WHERE i.CUISINE_DESCRIPTION LIKE '%" + cuisine + "%' AND i.SCORE < :filter1 AND r.rating > :filter2 AND r.price < :filter3",
-  //   // [score, rating, price]
-  //   );
-
-  // console.log(result.rows);
-  // res.json(result.rows);
 });
 
+// function for finding the best neighborhood
 router.get('/cuisineNeighborhood/:cuisine/:score/:rating/:price', async function (req, res) {
   var cuisine = req.params.cuisine;
-   var score = req.params.score;
+  var score = req.params.score;
   var rating = req.params.rating;
   var price = req.params.price;
 
   var query = "WITH T AS ( "
-    + "SELECT i.CAMIS, AVG(i.SCORE) AS AVG_SCORE, min(BORO) as BORO "
-    + "FROM Inspection i "
-    + "JOIN Restaurant r ON i.CAMIS = r.CAMIS "
-    + "JOIN Category c ON i.CAMIS = c.CAMIS "
-    + "WHERE r.rating > " + rating + " AND r.price < "+ price + " AND SCORE != 'NA'"
-    + "AND (UPPER(i.CUISINE_DESCRIPTION) LIKE '%" + cuisine.toUpperCase() + "%' OR UPPER(c.categories) LIKE '%" + cuisine.toUpperCase() + "%') "
-    + "GROUP BY i.CAMIS "
-    + ") \
-    SELECT BORO, AVG(AVG_SCORE) AS AVG_SCORE, COUNT(*) as NUM \
-    FROM T t \
-    WHERE t.AVG_SCORE < " + score + " \
-    GROUP BY t.BORO \
-    ORDER BY NUM DESC, AVG_SCORE ASC"
+  + "SELECT i.CAMIS, AVG(i.SCORE) AS AVG_SCORE, min(BORO) as BORO "
+  + "FROM Inspection i "
+  + "JOIN Restaurant r ON i.CAMIS = r.CAMIS "
+  + "JOIN Category c ON i.CAMIS = c.CAMIS "
+  + "WHERE r.rating > " + rating + " AND r.price < "+ price + " AND SCORE != 'NA'"
+  + "AND (UPPER(i.CUISINE_DESCRIPTION) LIKE '%" + cuisine.toUpperCase() + "%' OR UPPER(c.categories) LIKE '%" + cuisine.toUpperCase() + "%') "
+  + "GROUP BY i.CAMIS "
+  + ") \
+  SELECT BORO, AVG(AVG_SCORE) AS AVG_SCORE, COUNT(*) as NUM \
+  FROM T t \
+  WHERE t.AVG_SCORE < " + score + " \
+  GROUP BY t.BORO \
+  ORDER BY NUM DESC, AVG_SCORE ASC"
 
 
-console.log(query)
+  console.log(query)
 
 
   var result = await database.simpleExecute(query);
 
-    console.log(result.rows);
+  console.log(result.rows);
   res.json(result.rows);
 });
 
-/* ----- Q2 (Recommendations) ----- */
+/* ----- P2 (Avoids) ----- */
 
-//router.get('/recommendations/:selectedBoro/:boro', async function(req, res) {
-router.get('/recommendations/:boro', async function(req, res) {
+// For the first function in the avoids page
+router.get('/avoids/:boro', async function(req, res) {
   const boro = req.params.boro;
 
-  console.log("===============");
-  console.log('hahaha')
   console.log("boro:", boro);
   var query =
   "SELECT * "+
   "FROM "+
-"(SELECT X.Name, X.CUISINE_DESCRIPTION, X.INSPECTION_DATE, X.CRITICAL_FLAG, Z.LOW "+
+  "(SELECT X.Name, X.CUISINE_DESCRIPTION, X.INSPECTION_DATE, X.CRITICAL_FLAG, Z.LOW "+
   "FROM "+
-"(SELECT DISTINCT r.CAMIS, r.Name, i.CUISINE_DESCRIPTION, i.INSPECTION_DATE, i.CRITICAL_FLAG, i.SCORE "+
-"FROM INSPECTION i, RESTAURANT r, COLLISION c " +
-"WHERE r.CAMIS=i.CAMIS AND c.BOROUGH=i.BORO AND i.BORO='" + boro.toUpperCase() + "' AND CRITICAL_FLAG != 'Not Applicable') X, "+
-"(SELECT r.CAMIS, COUNT(VIOLATION_CODE) as count "+
-"FROM INSPECTION i, RESTAURANT r, COLLISION c " +
-"WHERE r.CAMIS=i.CAMIS AND c.BOROUGH=i.BORO AND i.BORO='" + boro.toUpperCase() + "' AND CRITICAL_FLAG != 'Not Applicable' "+
-"GROUP BY r.CAMIS) Y, "+
-"(SELECT r.CAMIS, min(i.SCORE) as low "+
-"FROM INSPECTION i, RESTAURANT r, COLLISION c "+
-"WHERE r.CAMIS=i.CAMIS AND c.BOROUGH=i.BORO AND i.BORO='" + boro.toUpperCase() + "' AND CRITICAL_FLAG != 'Not Applicable' AND SCORE !='NA' "+
-"GROUP BY r.CAMIS) Z " +
-"WHERE X.CAMIS=Y.CAMIS AND X.CAMIS=Z.CAMIS AND X.SCORE=Z.low "+
-"ORDER BY Y.count ASC, X.SCORE DESC) " +
-"WHERE ROWNUM <=20"
-      console.log(query)
+  "(SELECT DISTINCT r.CAMIS, r.Name, i.CUISINE_DESCRIPTION, i.INSPECTION_DATE, i.CRITICAL_FLAG, i.SCORE "+
+  "FROM INSPECTION i, RESTAURANT r, COLLISION c " +
+  "WHERE r.CAMIS=i.CAMIS AND c.BOROUGH=i.BORO AND i.BORO='" + boro.toUpperCase() + "' AND CRITICAL_FLAG != 'Not Applicable') X, "+
+  "(SELECT r.CAMIS, COUNT(VIOLATION_CODE) as count "+
+  "FROM INSPECTION i, RESTAURANT r, COLLISION c " +
+  "WHERE r.CAMIS=i.CAMIS AND c.BOROUGH=i.BORO AND i.BORO='" + boro.toUpperCase() + "' AND CRITICAL_FLAG != 'Not Applicable' "+
+  "GROUP BY r.CAMIS) Y, "+
+  "(SELECT r.CAMIS, min(i.SCORE) as low "+
+  "FROM INSPECTION i, RESTAURANT r, COLLISION c "+
+  "WHERE r.CAMIS=i.CAMIS AND c.BOROUGH=i.BORO AND i.BORO='" + boro.toUpperCase() + "' AND CRITICAL_FLAG != 'Not Applicable' AND SCORE !='NA' "+
+  "GROUP BY r.CAMIS) Z " +
+  "WHERE X.CAMIS=Y.CAMIS AND X.CAMIS=Z.CAMIS AND X.SCORE=Z.low "+
+  "ORDER BY Y.count ASC, X.SCORE ASC) " +
+  "WHERE ROWNUM <=20"
 
+  console.log(query)
+  var result = await database.simpleExecute(query);
+  console.log(result.rows);
+  res.json(result.rows);
 
-        var result = await database.simpleExecute(query);
-
-        console.log(result.rows);
-        res.json(result.rows);
-  // connection.query(query, function (err, rows, fields) {
-  //   if (err) {
-  //     console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!");
-  //     console.log(err);
-  //   }
-  //   else {
-  //     console.log(rows);
-  //     res.json(rows);
-  //   }
-  // });
 });
+// for the second function in the avoids page
 router.get('/violation/:restaurantName', async function(req, res) {
   const pubName = req.params.restaurantName;
 
-  console.log("===============");
-  console.log('hahaha')
   console.log("pubName:", pubName);
   var query =
   "SELECT * "+
-    "FROM( "+
-"SELECT  Y.count, X.VIOLATION_DESCRIPTION "+
-"FROM "+
-"(SELECT DISTINCT r.CAMIS, r.Name, i.CUISINE_DESCRIPTION, i.INSPECTION_DATE, i.CRITICAL_FLAG, i.SCORE, i.VIOLATION_DESCRIPTION "+
-"FROM INSPECTION i, RESTAURANT r "+
-"WHERE r.CAMIS=i.CAMIS AND r.Name='" + pubName + "'AND CRITICAL_FLAG != 'Not Applicable') X, "+
-"(SELECT r.CAMIS, r.Name, r.ZIPCODE, COUNT(*) as count "+
-"FROM INSPECTION i, RESTAURANT r "+
-"WHERE r.CAMIS=i.CAMIS AND r.Name='" + pubName + "'AND CRITICAL_FLAG != 'Not Applicable' "+
-"GROUP BY r.CAMIS, r.Name, r.ZIPCODE) Y, "+
-"(SELECT r.CAMIS, max(i.INSPECTION_DATE) as recent "+
-"FROM INSPECTION i, RESTAURANT r "+
-"WHERE r.CAMIS=i.CAMIS AND r.Name='" + pubName + "'AND CRITICAL_FLAG != 'Not Applicable' AND SCORE !='NA' "+
-"GROUP BY r.CAMIS) Z "+
-"WHERE X.CAMIS=Y.CAMIS AND X.CAMIS=Z.CAMIS AND X.INSPECTION_DATE=Z.recent "+
-"ORDER BY X.VIOLATION_DESCRIPTION DESC, Z.recent) "+
-"WHERE ROWNUM=1"
+  "FROM( "+
+  "SELECT  Y.count, X.VIOLATION_DESCRIPTION "+
+  "FROM "+
+  "(SELECT DISTINCT r.CAMIS, r.Name, i.CUISINE_DESCRIPTION, i.INSPECTION_DATE, i.CRITICAL_FLAG, i.SCORE, i.VIOLATION_DESCRIPTION "+
+  "FROM INSPECTION i, RESTAURANT r "+
+  "WHERE r.CAMIS=i.CAMIS AND r.Name='" + pubName + "'AND CRITICAL_FLAG != 'Not Applicable') X, "+
+  "(SELECT r.CAMIS, r.Name, r.ZIPCODE, COUNT(*) as count "+
+  "FROM INSPECTION i, RESTAURANT r "+
+  "WHERE r.CAMIS=i.CAMIS AND r.Name='" + pubName + "'AND CRITICAL_FLAG != 'Not Applicable' "+
+  "GROUP BY r.CAMIS, r.Name, r.ZIPCODE) Y, "+
+  "(SELECT r.CAMIS, max(i.INSPECTION_DATE) as recent "+
+  "FROM INSPECTION i, RESTAURANT r "+
+  "WHERE r.CAMIS=i.CAMIS AND r.Name='" + pubName + "'AND CRITICAL_FLAG != 'Not Applicable' AND SCORE !='NA' "+
+  "GROUP BY r.CAMIS) Z "+
+  "WHERE X.CAMIS=Y.CAMIS AND X.CAMIS=Z.CAMIS AND X.INSPECTION_DATE=Z.recent "+
+  "ORDER BY X.VIOLATION_DESCRIPTION DESC, Z.recent) "+
+  "WHERE ROWNUM=1"
 
 
-console.log(query)
-var result = await database.simpleExecute(query);
-console.log(result.rows);
-res.json(result.rows);
-  // connection.query(query, function (err, rows, fields) {
-  //   if (err) {
-  //     console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!");
-  //     console.log(err);
-  //   }
-  //   else {
-  //     console.log(rows);
-  //     res.json(rows);
-  //   }
-  // });
+  console.log(query)
+  var result = await database.simpleExecute(query);
+  console.log(result.rows);
+  res.json(result.rows);
+
 });
 
-/* ----- Q3 (Best Of Decades) ----- */
+/* ----- P3 (Collision) ----- */
 
-router.get('/decades', async function(req, res) {
-  var query = "SELECT temp*10 AS decade FROM (SELECT DISTINCT SUBSTRING(release_year, 1, 3) AS temp \
-  FROM Movies) decadeStub ORDER BY decade";
-
-  connection.query(query, function (err, rows, fields) {
-    if (err) console.log(err);
-    else {
-      console.log(rows);
-      res.json(rows);
-    }
-  });
-});
-
-router.get('/bestof/:decade', async function(req, res) {
-  var decade = req.params.decade;
-  var decadeEnd = decade.substring(0, decade.length - 1) + 9;
-
-  var query = "SELECT g1.genre, m1.title, m1.release_year, m1.vote_count FROM \
-  Genres g1 JOIN Movies m1 JOIN \
-  (SELECT g.genre, MAX(vote_count) as maxVotes FROM Genres g JOIN Movies m on g.movie_id = m.id \
-  WHERE release_year <= " + decadeEnd + " AND release_year >= " + decade + " GROUP BY g.genre) temp \
-  ON g1.movie_id = m1.id AND g1.genre = temp.genre AND m1.vote_count = temp.maxVotes \
-  WHERE release_year <= " + decadeEnd + " AND release_year >= " + decade + " ORDER BY g1.genre";
-
-  connection.query(query, function (err, rows, fields) {
-    if (err) console.log(err);
-    else {
-      console.log(rows);
-      res.json(rows);
-    }
-  });
-});
-
-
-/* ----- Bonus (Posters) ----- */
-
-router.get('/collisions/:minViolations', async function (req, res) {
-  var minViolations = req.params.minViolations;
+router.get('/collisions/:minVio', async function (req, res) {
+  var min_vio = req.params.minVio;
 
   var query = ""
-+ "SELECT AVG(rating) as avgRating, min(contributing_factor_vehicle_2) as contributing_factor FROM "
-+ "(SELECT r.zipcode, rating FROM restaurant r join inspection i on r.camis = i.camis) r2 JOIN "
-+ "(SELECT zip_code, contributing_factor_vehicle_2 FROM "
-+ "(SELECT zip_code, ROWNUM as RN, contributing_factor_vehicle_2 FROM "
-+ "(SELECT zip_code, count(*), min(c2.contributing_factor_vehicle_2) as contributing_factor_vehicle_2 FROM Collision c2 JOIN "
-+ "(SELECT contributing_factor_vehicle_2 FROM "
-+ "(Select contributing_factor_vehicle_2, ROWNUM as RN FROM "
-+ "(SELECT contributing_factor_vehicle_2, count(*) as count FROM Collision c JOIN "
-+ "  (SELECT DISTINCT zipcode as zipcode FROM "
-+ "    (SELECT camis, count(DISTINCT violation_code) as numViolations, min(zipcode) as zipcode "
-+ "      FROM inspection i GROUP BY camis "
-+ "      HAVING count(DISTINCT violation_code) >= " + minViolations + " )) zips "
-+ "  on c.ZIP_CODE = zips.zipcode where contributing_factor_vehicle_2 is not null group by contributing_factor_vehicle_2 order by count(*) DESC)) where RN = 2) maxVeh "
-+ "ON c2.contributing_factor_vehicle_2 = maxVeh.contributing_factor_vehicle_2 GROUP BY zip_code order by count(*) DESC)) WHERE RN >= 30) zips "
-+ "on r2.zipcode = zips.zip_code"
+  + "SELECT AVG(rating) as avgRating, min(contributing_factor_vehicle_2) as contributing_factor FROM "
+  + "(SELECT r.zipcode, rating FROM restaurant r join inspection i on r.camis = i.camis) r2 JOIN "
+  + "(SELECT zip_code, contributing_factor_vehicle_2 FROM "
+  + "(SELECT zip_code, ROWNUM as RN, contributing_factor_vehicle_2 FROM "
+  + "(SELECT zip_code, count(*), min(c2.contributing_factor_vehicle_2) as contributing_factor_vehicle_2 FROM Collision c2 JOIN "
+  + "(SELECT contributing_factor_vehicle_2 FROM "
+  + "(Select contributing_factor_vehicle_2, ROWNUM as RN FROM "
+  + "(SELECT contributing_factor_vehicle_2, count(*) as count FROM Collision c JOIN "
+  + "  (SELECT DISTINCT zipcode as zipcode FROM "
+  + "    (SELECT camis, count(DISTINCT violation_code) as numViolations, min(zipcode) as zipcode "
+  + "      FROM inspection i GROUP BY camis "
+  + "      HAVING count(DISTINCT violation_code) >= " + min_vio + " )) zips "
+  + "  on c.ZIP_CODE = zips.zipcode where contributing_factor_vehicle_2 is not null group by contributing_factor_vehicle_2 order by count(*) DESC)) where RN = 2) maxVeh "
+  + "ON c2.contributing_factor_vehicle_2 = maxVeh.contributing_factor_vehicle_2 GROUP BY zip_code order by count(*) DESC)) WHERE RN >= 30) zips "
+  + "on r2.zipcode = zips.zip_code"
 
-console.log(query)
+  console.log(query)
 
   var result = await database.simpleExecute(query);
 
-    console.log(result.rows);
+  console.log(result.rows);
   res.json(result.rows);
 });
 
-/* General Template for GET requests:
-
-router.get('/routeName/:customParameter', function(req, res) {
-  // Parses the customParameter from the path, and assigns it to variable myData
-  var myData = req.params.customParameter;
-  var query = '';
-  console.log(query);
-  connection.query(query, function(err, rows, fields) {
-    if (err) console.log(err);
-    else {
-      // Returns the result of the query (rows) in JSON as the response
-      res.json(rows);
-    }
-  });
-});
-*/
-
-
 module.exports = router;
 
+// function to invote on shutdown, closes oracleDB database
 async function shutdown(e) {
   let err = e;
 

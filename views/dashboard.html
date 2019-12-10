@@ -20,10 +20,8 @@
       <span class="navbar-brand center">Urban Well Being</span>
         <ul class="navbar-nav">
           <li><a class="nav-item nav-link active" href="/">Dashboard/Cuisines</a></li>
-          <li><a class="nav-item nav-link" href="/recommendations">Don't-Go Restaurant</a></li>
-          <li><a class="nav-item nav-link" href="/bestof">Best Of</a></li>
+          <li><a class="nav-item nav-link" href="/avoids">Don't-Go Restaurant</a></li>
           <li><a class="nav-item nav-link" href="/collision">Collision Restaurant Subdivision</a></li>
-          <li><a class="nav-item nav-link" href="/reference">Reference</a></li>
         </ul>
     </nav>
 
@@ -34,8 +32,10 @@
         <div class="input-container">
           <div class="h6">Want more info on a certain Cuisine?</div>
           <div class="row">
+            <!-- Enter the cuisine name that we want to search by -->
             <input type="text" ng-model="cuisineName" placeholder="Enter Cuisine" id="cuisineName" class="cuisine-input"/>
             <div class="centered">Filters: </div>
+            <!-- Filters for data -->
             <input type="text" ng-model="scoreFilter" placeholder="Score < " id="scoreFilter" class="filter-input"/>
             <input type="text" ng-model="ratingFilter" placeholder="Rating > " id="ratingFilter" class="filter-input"/>
             <input type="text" ng-model="priceFilter" placeholder="Price < " id="priceFilter" class="filter-input"/>
@@ -44,6 +44,7 @@
           <button id="cuisineNeighborhoodBtn" class="submit-btn" ng-click="bestNeighborhood()">Find Best Neighborhood for Cuisine</button>
         </div>
         <br>
+        <!-- Display the best neighborhood -->
         <div class="row">
           <div class="text">Best Neighborhood for Cuisine:&nbsp;</div>
           <div class="text">{{neighborhood}}</div>
@@ -52,9 +53,9 @@
     </div>
 
     <!-- User Content -->
-    <div class="container movies-container">
+    <div class="container cuisineData-container">
       <div class="jumbotron">
-        <!-- Display top 10 movies when a genre is clicked -->
+        <!-- Display cuisine data when the Comprehensive Cuisine Data button is clicked -->
           <table class="table table-bordered table-striped">
             <thead>
               <tr>
@@ -92,26 +93,9 @@
                 <td>{{cuisine.RATING}}</td>
                 <td>{{cuisine.PRICE}}</td>
                 <td>{{cuisine.ADDRESS}}</td>
-<!-- NEEEEDDDD TOOLTIP -->
-<!--                 <div ng-if="hoverNow == true">
-                  <div class="h5">TEXT</div>>
-                </div> -->
               </tr>
             </tbody>
           </table>
-
-<!--           <div class="movie">
-            <div class="header"><strong>Inspection Score</strong></div>
-            <div class="header"><strong>Rating</strong></div>
-            <div class="header"><strong>Price Level</strong></div>
-            <div class="header"><strong>Neighborhood</strong></div>
-          </div>
-          <div class="movie" id="results" ng-repeat="cuisine in cuisineInfo">
-            <div class="title">{{movie.title}}</div>
-            <div class="id">{{movie.id}}</div>
-            <div class="rating">{{movie.rating}}</div>
-            <div class="vote-count">{{movie.vote_count}}</div>
-          </div> -->
       </div>
     </div>
 

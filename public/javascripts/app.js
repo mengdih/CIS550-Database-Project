@@ -2,37 +2,20 @@ var app = angular.module('angularjsNodejsTutorial', []);
 
 // Controller for the Dashboard page
 app.controller('dashboardController', function($scope, $http) {
- //  $http({
- //    url: '/genres',
- //    method: 'GET'
- //  }).then(res => {
- //    console.log("genres: ", res.data);
- //    $scope.genres = res.data;
- //  }, err => {
- //    console.log("Genre ERROR: ", err);
- //  });
 
-  // $scope.showMovies = function(g) {
-  //  $http({
-  //    url: '/genres/' + g.genre,
-  //     method: 'GET'
-  //   }).then(res => {
-  //     console.log("movies: ", res.data);
-  //     $scope.movies = res.data;
-  //   }, err => {
-  //     console.log("Movie ERROR: ", err);
-  //   });
- //  }
 
   $scope.sortType = 'AVG_SCORE'; // set the default sort type
   $scope.sortReverse  = false;  // set the default sort order
 
   console.log("here")
 
-  $scope.cuisineInfo = {};
+  $scope.cuisineInfo = {}; // variable for containing cuisineInfo so it can be sorted later
 
-  $scope.cuisineData = function() {
+  // function for getting the data for all restaurants with a certain cuisine
+  $scope.cuisineData = function() { 
+    // if statement to check if input field is empty
     if($scope.cuisineName != null && $scope.cuisineName != ""){
+      // default values for parameters
       var score = 100;
       var rating = -1;
       var price = 100;
@@ -48,13 +31,16 @@ app.controller('dashboardController', function($scope, $http) {
         console.log("cuisine: ", res.data);
         $scope.cuisineInfo = res.data;
       }, err => {
-        console.log("Movie ERROR: ", err);
+        console.log("Cuisine ERROR: ", err);
       });
     }
   }
 
+  // function for getting the best neighborhood
   $scope.bestNeighborhood = function() {
+    // if statement to check if input field is empty
     if($scope.cuisineName != null && $scope.cuisineName != ""){
+      // default values for parameters
       var score = 100;
       var rating = -1;
       var price = 100;
@@ -67,45 +53,29 @@ app.controller('dashboardController', function($scope, $http) {
         url: '/cuisineNeighborhood/' + $scope.cuisineName + '/' + score + '/' + rating + '/' + price,
         method: 'GET'
       }).then(res => {
-        console.log("movies: ", res.data);
+        console.log("neighborhood: ", res.data);
         $scope.neighborhood = res.data[0].BORO;
       }, err => {
-        console.log("Movie ERROR: ", err);
+        console.log("Neighborhood ERROR: ", err);
       });
+    }
   }
-  }
-
-  $scope.globalName = null;
-  $scope.hoverNow = false;
-
-  // TOOLTIP HERE!!!!!!!!!!!!!!
-
-  $scope.hoverIn = function(cuisine){
-      $scope.globalName = cuisine.NAME;
-        $scope.hoverNow = true;
-        console.log($scope.globalName);
-    };
-
-    $scope.hoverOut = function(cuisine){
-      $scope.globalName = null;
-        $scope.hoverNow = false;
-        console.log($scope.globalName);
-    };
 });
 
-// Controller for the Recommendations Page
+// Controller for the Don't Go Restaurant Page
 app.controller('avoidsController', function($scope, $http) {
-  // TODO: Q2
+  /* For the first function
+  Input: choose borough via dropdown menu
+  Output: Restaurant Name, Cuisine Description, Inspectino Date, Critical Flag, and Inspection Score
+  */
   $scope.options = [{boro:'Staten Island'},{boro:'Manhattan'},{boro:'Bronx'},{boro:'Queens'},{boro:'Brooklyn'}];
   $scope.locationInfo = {};
   $scope.submitBoro = function() {
-  const boro = $scope.selectedBoro['boro'];
-  //if($scope.selectedBoro != null || $scope.selectedBoro != ""){
-  console.log("debugging");
-  //console.log("selectedBoro: ",$scope.selectedBoro['boro']);
-  console.log("selectedBoro: ", boro);
+    const boro = $scope.selectedBoro['boro'];
+    console.log("debugging");
+    console.log("selectedBoro: ", boro);
     $http({
-      url: '/recommendations/' + boro,
+      url: '/avoids/' + boro,
       method: 'GET'
     }).then(res => {
       console.log("location: ", res.data);
@@ -113,12 +83,15 @@ app.controller('avoidsController', function($scope, $http) {
     }, err => {
       console.log("location ERROR: ", err);
     });
-  //}
-}
-  $scope.violationInfo = {};
-  $scope.cuisineData = function() {
-    const restaurantName = $scope.RestaurantName;
-    console.log("restaurantName: ",restaurantName);
+  }
+ /*For the second function
+ Input: Restaurant Name
+ Output: Total Number of Violations, Violation Desctription
+ */
+ $scope.violationInfo = {};
+ $scope.cuisineData = function() {
+  const restaurantName = $scope.RestaurantName;
+  console.log("restaurantName: ",restaurantName);
   $http({
     url: '/violation/' + restaurantName,
     method: 'GET'
@@ -126,53 +99,27 @@ app.controller('avoidsController', function($scope, $http) {
     console.log("violationInfo: ", res.data);
     $scope.violationInfo = res.data;
   }, err => {
-    console.log("Movie ERROR: ", err);
+    console.log("Violation ERROR: ", err);
   });
 }
-
-
-});
-
-// Controller for the Best Of Page
-app.controller('bestofController', function($scope, $http) {
-  // TODO: Q3
-  $http({
-    url: '/decades',
-    method: 'GET'
-  }).then(res => {
-    console.log("decades: ", res.data);
-    $scope.decades = res.data;
-  }, err => {
-    console.log("Decades ERROR: ", err);
-  });
-
-  $scope.submitDecade = function() {
-    $http({
-      url: '/bestof/' + $scope.selectedDecade.decade,
-      method: 'GET'
-    }).then(res => {
-      console.log("best movies: ", res.data);
-      $scope.bestofMovies = res.data;
-    }, err => {
-      console.log("Best Movie ERROR: ", err);
-    });
-  }
 });
 
 // Controller for the Collisions Page
+
 app.controller('collisionController', function($scope, $http) {
+  // function to return the average rating of all restaurants in neighborhoods with similar collisions, as well as the contributing factor
   $scope.collisionsData = function() {
-    if($scope.minViolations != null && $scope.minViolations != ""){
-      $http({
-        url: '/collisions/' + $scope.minViolations,
-        method: 'GET'
-      }).then(res => {
-        console.log("movies: ", res.data);
-        $scope.rating = res.data[0].AVGRATING;
+   if($scope.minViolations != null && $scope.minViolations != ""){
+    $http({
+      url: '/collisions/' + $scope.minViolation,
+      method: 'GET'
+    }).then(res => {
+      console.log("Summary statistics: ", res.data);
+        $scope.rating = res.data[0].AVGRATING.toFixed(3);
         $scope.factor = res.data[0].CONTRIBUTING_FACTOR;
       }, err => {
-        console.log("Movie ERROR: ", err);
+        console.log("Collision ERROR: ", err);
       });
   }
-  }
+}
 });

@@ -1,9 +1,9 @@
-.bestof-container {
+.avoidRestaurant-container {
   margin-left: 250px;
   margin-top: 2rem;
 }
 
-.years-container {
+.neighborhood-container {
   display: flex;
   flex-flow: row nowrap;
   justify-content: flex-start;
@@ -11,7 +11,7 @@
   border-bottom: 1px solid #ddd;
 }
 
-.years-container .dropdown-container {
+.neighborhood-container .dropdown-container {
   height: 30px;
   overflow: hidden;
   width: 140px;
@@ -21,8 +21,7 @@
   outline: none;
   border: 1px solid #bbb;
 }
-
-.years-container .dropdown {
+.neighborhood-container .dropdown {
   background: transparent;
   border: none;
   font-size: 14px;
@@ -33,9 +32,8 @@
   outline: none;
 }
 
-.years-container .submit-btn {
+.neighborhood-container .submit-btn {
   margin-left: 10px;
-  /* width: 250px; */
   height: 30px;
   border: none;
   padding: 2px 16px;
@@ -48,21 +46,33 @@
   font-size: 12px;
 }
 
-.years-container .submit-btn:hover {
+.neighborhood-container .submit-btn:hover {
   background: #c561ae;
 }
 
-.years-container .submit-btn:active {
+.neighborhood-container .submit-btn:active {
   background: #d86bbe;
 }
+/* .centered {
+  margin: 10px 0;
+  height: 36px;
+  border: none;
+  padding: 2px 16px;
+  box-sizing: border-box;
+  border-radius: 20px;
+  outline: none;
+}
 
-.movies-container {
+.navbar-default {
+    background-color: #F8F8F8;
+    border-color: #E7E7E7;
+} */
+.output-container {
   display: flex;
   flex-flow: column wrap;
   margin-top: 10px;
 }
-
-.movies-container .movie {
+.output-container .avoid {
   display: flex;
   flex-flow: row nowrap;
   align-items: center;
@@ -70,6 +80,6 @@
   padding: 0 10px;
 }
 
-.movie .header, .movie .title, .movie .genre, .movie .votes, .movie .year {
+.avoid .header, .avoid .Name, .avoid .Cuisine_Description, .avoid .Inspection_Date, .avoid .Critical_Flag, .avoid .Inspection_Score {
   flex: 1 0 25%;
 }

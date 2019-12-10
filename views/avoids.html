@@ -11,7 +11,7 @@
     <script src="javascripts/app.js" type="text/javascript"></script>
     <!-- Custom styles for this template-->
     <link href="/stylesheets/common.css" rel="stylesheet">
-    <link href="/stylesheets/recommendations.css" rel="stylesheet">
+    <link href="/stylesheets/avoids.css" rel="stylesheet">
   </head>
 
   <body ng-controller="avoidsController">
@@ -20,10 +20,8 @@
       <span class="navbar-brand center">Urban Well Being</span>
         <ul class="navbar-nav">
           <li><a class="nav-item nav-link" href="/">Dashboard/Cuisines</a></li>
-          <li><a class="nav-item nav-link active" href="/recommendations">Don't-Go Restaurant</a></li>
-          <li><a class="nav-item nav-link" href="/bestof">Best Of</a></li>
-          <li><a class="nav-item nav-link" href="/posters">Posters</a></li>
-          <li><a class="nav-item nav-link" href="/reference">Reference</a></li>
+          <li><a class="nav-item nav-link active" href="/avoids">Don't-Go Restaurant</a></li>
+          <li><a class="nav-item nav-link" href="/collision">Collision Restaurant Subdivision</a></li>
         </ul>
     </nav>
 
@@ -42,23 +40,9 @@
         </div>
         <div class="h5">You may want to avoid...</div>
       </div>
-        <!-- <br> -->
-        <!-- <div class="input-container">
-          <div class="h6">What type of food would you like to eat today?</div>
-          <input type="text" ng-model="movieName" placeholder="Give me a cuisine type" id="movieName" class="movie-input"/>
-          <button id="submitMovieBtn" class="submit-btn" ng-click="submitIds()">Submit</button>
-        </div> -->
-
         <div class="jumbotron">
         <div class="output-container">
-          <!-- <div class="h6">You may want to avoid...</div> -->
           <div class="restaurant">
-            <!-- <div class="header"><strong>Name</strong></div>
-            <div class="header"><strong>Cuisine Description</strong></div>
-            <div class="header"><strong>Inspection Date</strong></div>
-            <div class="header"><strong>Critical Flag</strong></div>
-            <div class="header"><strong>Inspection Score</strong></div> -->
-
             <table class="table table-bordered table-striped" data-pagination="true" data-side-pagination="client" data-page-size="3">
               <thead>
                 <tr>
@@ -104,22 +88,11 @@
               </tbody>
             </table>
           </div>
-          <!-- <div class="movie" id="results" ng-repeat="movie in recommendedMovies">
-            <div class="title">{{movie.title}}</div>
-            <div class="id">{{movie.id}}</div>
-            <div class="rating">{{movie.rating}}</div>
-            <div class="vote-count">{{movie.vote_count}}</div>
-          </div> -->
         </div>
       </div>
       <div class="jumbotron">
         <div class="output-container">
           <div class="restaurant">
-            <!-- <div class="header"><strong>Name</strong></div>
-            <div class="header"><strong>Cuisine Description</strong></div>
-            <div class="header"><strong>Inspection Date</strong></div>
-            <div class="header"><strong>Critical Flag</strong></div>
-            <div class="header"><strong>Inspection Score</strong></div> -->
             <table class="table table-bordered table-striped" data-pagination="true" data-side-pagination="client" data-page-size="3">
               <thead>
                 <tr>
@@ -133,31 +106,12 @@
                       Violation Description <span ng-show="sortType == 'VIOLATION_DESCRIPTION'"><span ng-show="!sortReverse">&#9650;</span><span ng-show="sortReverse">&#9660;</span></span>
                     </a>
                   </th>
-                  <!-- <th>
-                    <a href="#" ng-click="sortType = 'RATING'; sortReverse = !sortReverse">
-                      Inspection Date <span ng-show="sortType == 'RATING'"><span ng-show="!sortReverse">&#9650;</span><span ng-show="sortReverse">&#9660;</span></span>
-                    </a>
-                  </th>
-                  <th>
-                    <a href="#" ng-click="sortType = 'PRICE'; sortReverse = !sortReverse">
-                      Critical Flag <span ng-show="sortType == 'PRICE'"><span ng-show="!sortReverse">&#9650;</span><span ng-show="sortReverse">&#9660;</span></span>
-                    </a>
-                  </th>
-                  <th>
-                    <a href="#" ng-click="sortType = 'ADDRESS'; sortReverse = !sortReverse">
-                      Inspection Score <span ng-show="sortType == 'ADDRESS'"><span ng-show="!sortReverse">&#9650;</span><span ng-show="sortReverse">&#9660;</span></span>
-                    </a>
-                  </th> -->
                 </tr>
               </thead>
               <tbody>
                 <tr ng-repeat="v in violationInfo | orderBy:sortType:sortReverse" ng-mouseover="hoverIn(cuisine)" ng-mouseleave="hoverOut(cuisine)">
                   <td>{{v.COUNT}}</td>
                   <td>{{v.VIOLATION_DESCRIPTION}}</td>
-
-  <!--                 <div ng-if="hoverNow == true">
-                    <div class="h5">TEXT</div>>
-                  </div> -->
                 </tr>
               </tbody>
             </table>

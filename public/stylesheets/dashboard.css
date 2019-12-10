@@ -55,14 +55,14 @@
     border-color: #E7E7E7;
 }
 
-.movies-container {
+.cuisineData-container {
   margin-left: 250px;
   display: flex;
   flex-flow: column wrap;
   margin-top: 10px;
 } 
 
- .movies-container .movie {
+ .cuisineData-container .cuisineData {
   display: flex;
   flex-flow: row nowrap;
   align-items: center;
@@ -70,24 +70,10 @@
   padding: 0 10px;
 } 
 
- .movie .title, .movie .header-lg {
+ .cuisineData .title, .cuisineData .header-lg {
   flex: 1 0 50%;
 } 
 
- .movie .header, .movie .rating, .movie .votes {
+ .cuisineData .header {
   flex: 1 0 25%;
-} 
-
-.animate-show {
-    -webkit-transition: all linear 0.5s;
-    transition: all linear 0.5s;
-    opacity: 1;
-}
-
-.animate-show.ng-hide-add,
-.animate-show.ng-hide-remove {
-    display: inline-block !important;
-}
-.animate-show.ng-hide {
-    opacity: 0;
 }
