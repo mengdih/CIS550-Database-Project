@@ -66,7 +66,7 @@ app.controller('dashboardController', function($scope, $http) {
 app.controller('avoidsController', function($scope, $http) {
   /* For the first function
   Input: choose borough via dropdown menu
-  Output: Restaurant Name, Cuisine Description, Inspectino Date, Critical Flag, and Inspection Score
+  Output: Restaurant Name, Cuisine Description, Inspection Date, Critical Flag, and Inspection Score
   */
   $scope.options = [{boro:'Staten Island'},{boro:'Manhattan'},{boro:'Bronx'},{boro:'Queens'},{boro:'Brooklyn'}];
   $scope.locationInfo = {};
@@ -86,7 +86,7 @@ app.controller('avoidsController', function($scope, $http) {
   }
  /*For the second function
  Input: Restaurant Name
- Output: Total Number of Violations, Violation Desctription
+ Output: Total Number of Violations, Violation Description
  */
  $scope.violationInfo = {};
  $scope.cuisineData = function() {
